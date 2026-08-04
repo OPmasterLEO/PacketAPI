@@ -1,0 +1,9 @@
+name: MasterPacketAPI
+version: ${version}
+main: org.mastersmp.packet.plugin.MasterPacketPlugin
+api-version: '1.16'
+folia-supported: true
+load: STARTUP
+authors: [OPmasterLEO]
+description: Multi-version NMS and packet abstraction for Paper, Folia and Canvas.
+website: https://github.com/OPmasterLEO/MasterPacketAPI
