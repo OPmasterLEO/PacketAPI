@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.mastersmp.packet.nms.MenuBridge;
 
@@ -28,8 +27,17 @@ public final class SharedMenuBridge implements MenuBridge {
             return null;
         }
         AbstractContainerMenu menu = sp.containerMenu;
-        String typeKey = menu.getType() == null ? "minecraft:generic_9x3" : String.valueOf(MenuType.getKey(menu.getType()));
-        Component title = Component.text("");
+        String typeKey = "minecraft:generic_9x3";
+        if (menu.getType() != null) {
+            Object key = Reflect.invoke(MenuType.class, "getKey", new Class<?>[]{MenuType.class}, menu.getType());
+            if (key == null) {
+                key = Reflect.invoke(menu.getType(), "toString");
+            }
+            if (key != null) {
+                typeKey = String.valueOf(key);
+            }
+        }
+        Component title = Component.empty();
         Object titleObj = Reflect.invoke(menu, "getTitle", "title");
         if (titleObj instanceof net.minecraft.network.chat.Component nmsTitle) {
             title = io.papermc.paper.adventure.PaperAdventure.asAdventure(nmsTitle);
@@ -39,7 +47,7 @@ public final class SharedMenuBridge implements MenuBridge {
 
     @Override
     public boolean isPlayerInventoryMenu(Object menuType) {
-        return menuType == MenuType.GENERIC_9x4 || menuType == null;
+        return menuType == null;
     }
 
     @Override
