@@ -12,7 +12,6 @@ import org.bukkit.entity.Entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.mastersmp.packet.nms.WorldBridge;
 
@@ -47,13 +46,9 @@ public final class SharedWorldBridge implements WorldBridge {
         if (!(level instanceof ServerLevel serverLevel)) {
             return 20f;
         }
-        try {
-            Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
-            Object rate = Reflect.invoke(manager, "tickrate");
-            return rate instanceof Number n ? n.floatValue() : 20f;
-        } catch (Throwable ignored) {
-            return 20f;
-        }
+        Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
+        Object rate = Reflect.invoke(manager, "tickrate");
+        return rate instanceof Number n ? n.floatValue() : 20f;
     }
 
     @Override
@@ -62,25 +57,14 @@ public final class SharedWorldBridge implements WorldBridge {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        try {
-            Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
-            Reflect.invoke(manager, "setFrozen", new Class<?>[]{boolean.class}, frozen);
-        } catch (Throwable ignored) {
-        }
+        Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
+        Reflect.invoke(manager, "setFrozen", new Class<?>[]{boolean.class}, frozen);
     }
 
     @Override
     public int maxHorizontalCoord() {
-        try {
-            FieldValue value = new FieldValue();
-            Object constant = Reflect.get(Reflect.field(BlockPos.class, "MAX_HORIZONTAL_COORDINATE", "MAX_HORIZONTAL_COORD"), null);
-            if (constant instanceof Integer i) {
-                return i;
-            }
-            return 30_000_000;
-        } catch (Throwable ignored) {
-            return 30_000_000;
-        }
+        Object constant = Reflect.get(Reflect.field(BlockPos.class, "MAX_HORIZONTAL_COORDINATE", "MAX_HORIZONTAL_COORD"), null);
+        return constant instanceof Integer i ? i : 30_000_000;
     }
 
     @Override
@@ -91,16 +75,26 @@ public final class SharedWorldBridge implements WorldBridge {
     @Override
     public int chunkHeight(Object craftChunk, HeightmapType type, int x, int z) {
         if (!(craftChunk instanceof CraftChunk chunk)) {
-            return worldFloor(craftChunk);
+            return 0;
         }
-        LevelChunk handle = chunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
         Heightmap.Types nmsType = switch (type) {
             case MOTION_BLOCKING -> Heightmap.Types.MOTION_BLOCKING;
             case MOTION_BLOCKING_NO_LEAVES -> Heightmap.Types.MOTION_BLOCKING_NO_LEAVES;
             case OCEAN_FLOOR -> Heightmap.Types.OCEAN_FLOOR;
             case WORLD_SURFACE -> Heightmap.Types.WORLD_SURFACE;
         };
-        return handle.getHeight(nmsType, x & 15, z & 15);
+        Object handle = Reflect.invoke(chunk, "getHandle");
+        if (handle == null) {
+            try {
+                Class<?> statusClass = Class.forName("net.minecraft.world.level.chunk.status.ChunkStatus");
+                Object full = statusClass.getField("FULL").get(null);
+                handle = chunk.getClass().getMethod("getHandle", statusClass).invoke(chunk, full);
+            } catch (ReflectiveOperationException ignored) {
+                return 0;
+            }
+        }
+        Object height = Reflect.invoke(handle, "getHeight", new Class<?>[]{Heightmap.Types.class, int.class, int.class}, nmsType, x & 15, z & 15);
+        return height instanceof Integer i ? i : 0;
     }
 
     @Override
@@ -140,12 +134,5 @@ public final class SharedWorldBridge implements WorldBridge {
             return craft;
         }
         return null;
-    }
-
-    private static int worldFloor(Object craftChunk) {
-        return 0;
-    }
-
-    private static final class FieldValue {
     }
 }
