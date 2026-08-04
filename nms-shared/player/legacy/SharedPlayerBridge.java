@@ -18,8 +18,9 @@ public final class SharedPlayerBridge implements PlayerBridge {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void send(Player player, Object nmsPacket) {
-        if (!(nmsPacket instanceof Packet<?> packet)) {
+        if (!(nmsPacket instanceof Packet packet)) {
             return;
         }
         Object handle = handle(player);
