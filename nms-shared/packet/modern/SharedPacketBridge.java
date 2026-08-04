@@ -2,7 +2,6 @@ package org.mastersmp.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.bukkit.World;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -10,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundBlockEventPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
@@ -19,11 +17,9 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.mastersmp.packet.nms.PacketBridge;
 
 public final class SharedPacketBridge implements PacketBridge {

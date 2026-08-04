@@ -16,6 +16,7 @@ dependencies {
     compileOnly("io.netty:netty-transport:4.1.115.Final")
     compileOnly("io.netty:netty-handler:4.1.115.Final")
     compileOnly("net.kyori:adventure-api:4.17.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.17.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

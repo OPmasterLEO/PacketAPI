@@ -30,6 +30,16 @@ public final class AdvancedScheduler {
         Objects.requireNonNull(task, "task");
         if (platform.isPaper()) {
             Object scheduler = invoke(Bukkit.getServer(), "getGlobalRegionScheduler");
+            if (delayTicks <= 0L) {
+                Object scheduled = invoke(
+                        scheduler,
+                        "run",
+                        new Class<?>[]{Plugin.class, Consumer.class},
+                        plugin,
+                        (Consumer<Object>) t -> task.run()
+                );
+                return TaskHandle.ofFolia(scheduled);
+            }
             Object scheduled = invoke(
                     scheduler,
                     "runDelayed",
@@ -40,7 +50,7 @@ public final class AdvancedScheduler {
             );
             return TaskHandle.ofFolia(scheduled);
         }
-        return TaskHandle.of(Bukkit.getScheduler().runTaskLater(plugin, task, delayTicks));
+        return TaskHandle.of(Bukkit.getScheduler().runTaskLater(plugin, task, Math.max(0L, delayTicks)));
     }
 
     public TaskHandle runGlobalRepeating(Runnable task, long delayTicks, long periodTicks) {
