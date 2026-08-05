@@ -6,6 +6,7 @@ import org.mastersmp.packet.nms.ItemBridge;
 import org.mastersmp.packet.nms.MenuBridge;
 import org.mastersmp.packet.nms.NmsAdapter;
 import org.mastersmp.packet.nms.PacketBridge;
+import org.mastersmp.packet.nms.PacketWrapper;
 import org.mastersmp.packet.nms.PlayerBridge;
 import org.mastersmp.packet.nms.WorldBridge;
 
@@ -19,6 +20,7 @@ public abstract class AbstractNmsAdapter implements NmsAdapter {
     private final MenuBridge menus = new SharedMenuBridge();
     private final WorldBridge worlds = new SharedWorldBridge();
     private final ComponentBridge components = new SharedComponentBridge();
+    private final PacketWrapper wrapper = new SharedPacketWrapper();
 
     protected AbstractNmsAdapter(String bucketId) {
         this.bucketId = bucketId;
@@ -62,5 +64,10 @@ public abstract class AbstractNmsAdapter implements NmsAdapter {
     @Override
     public ComponentBridge components() {
         return components;
+    }
+
+    @Override
+    public PacketWrapper wrapper() {
+        return wrapper;
     }
 }
