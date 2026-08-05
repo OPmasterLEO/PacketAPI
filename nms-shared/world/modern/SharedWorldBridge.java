@@ -15,6 +15,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.mastersmp.packet.nms.WorldBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedWorldBridge implements WorldBridge {
 
     @Override
@@ -46,8 +50,8 @@ public final class SharedWorldBridge implements WorldBridge {
         if (!(level instanceof ServerLevel serverLevel)) {
             return 20f;
         }
-        Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
-        Object rate = Reflect.invoke(manager, "tickrate");
+        Object manager = invoke(serverLevel.getServer(), "tickRateManager");
+        Object rate = invoke(manager, "tickrate");
         return rate instanceof Number n ? n.floatValue() : 20f;
     }
 
@@ -57,13 +61,13 @@ public final class SharedWorldBridge implements WorldBridge {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        Object manager = Reflect.invoke(serverLevel.getServer(), "tickRateManager");
-        Reflect.invoke(manager, "setFrozen", new Class<?>[]{boolean.class}, frozen);
+        Object manager = invoke(serverLevel.getServer(), "tickRateManager");
+        invoke(manager, "setFrozen", new Class<?>[]{boolean.class}, frozen);
     }
 
     @Override
     public int maxHorizontalCoord() {
-        Object constant = Reflect.get(Reflect.field(BlockPos.class, "MAX_HORIZONTAL_COORDINATE", "MAX_HORIZONTAL_COORD"), null);
+        Object constant = get(field(BlockPos.class, "MAX_HORIZONTAL_COORDINATE", "MAX_HORIZONTAL_COORD"), null);
         return constant instanceof Integer i ? i : 30_000_000;
     }
 
@@ -83,7 +87,7 @@ public final class SharedWorldBridge implements WorldBridge {
             case OCEAN_FLOOR -> Heightmap.Types.OCEAN_FLOOR;
             case WORLD_SURFACE -> Heightmap.Types.WORLD_SURFACE;
         };
-        Object handle = Reflect.invoke(chunk, "getHandle");
+        Object handle = invoke(chunk, "getHandle");
         if (handle == null) {
             try {
                 Class<?> statusClass = Class.forName("net.minecraft.world.level.chunk.status.ChunkStatus");
@@ -93,7 +97,7 @@ public final class SharedWorldBridge implements WorldBridge {
                 return 0;
             }
         }
-        Object height = Reflect.invoke(handle, "getHeight", new Class<?>[]{Heightmap.Types.class, int.class, int.class}, nmsType, x & 15, z & 15);
+        Object height = invoke(handle, "getHeight", new Class<?>[]{Heightmap.Types.class, int.class, int.class}, nmsType, x & 15, z & 15);
         return height instanceof Integer i ? i : 0;
     }
 

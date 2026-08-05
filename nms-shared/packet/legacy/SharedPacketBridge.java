@@ -10,6 +10,10 @@ import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import org.mastersmp.packet.nms.PacketBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedPacketBridge implements PacketBridge {
 
     @Override
@@ -29,11 +33,11 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public int entityId(Object packet) {
-        Object value = Reflect.invoke(packet, "b", "a", "getEntityId", "entityId");
+        Object value = invoke(packet, "b", "a", "getEntityId", "entityId");
         if (value instanceof Integer i) {
             return i;
         }
-        Object field = Reflect.get(Reflect.field(packet.getClass(), "a", "b", "entityId", "id"), packet);
+        Object field = get(field(packet.getClass(), "a", "b", "entityId", "id"), packet);
         return field instanceof Integer i ? i : -1;
     }
 

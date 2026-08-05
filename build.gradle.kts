@@ -62,7 +62,7 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-    archiveBaseName.set("MasterPacketAPI")
+    archiveBaseName.set("PacketAPI")
     archiveClassifier.set("")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     exclude(
@@ -74,7 +74,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     manifest {
         attributes["Automatic-Module-Name"] = "org.mastersmp.packet"
-        attributes["Implementation-Title"] = "MasterPacketAPI"
+        attributes["Implementation-Title"] = "PacketAPI"
         attributes["Implementation-Version"] = project.version
         attributes["paperweight-mappings-namespace"] = "mojang"
     }
@@ -184,14 +184,20 @@ tasks.named("publishApiPublicationToReposiliteSnapshotsRepository").configure {
 
 tasks.named("publish").configure {
     group = "publishing"
-    description = "Publish fat jar + API to Reposilite releases"
+    description = "Publish fat jar to Reposilite releases"
     dependsOn(tasks.shadowJar)
 }
 
 tasks.register("publishSnapshot") {
     group = "publishing"
-    description = "Publish fat jar + API to Reposilite snapshots"
+    description = "Publish fat jar to Reposilite snapshots"
     dependsOn(tasks.shadowJar, "publishMavenPublicationToReposiliteSnapshotsRepository", "publishApiPublicationToReposiliteSnapshotsRepository")
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println(version)
+    }
 }
 
 tasks.named("publishToMavenLocal").configure {

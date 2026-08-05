@@ -10,6 +10,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.mastersmp.packet.nms.MenuBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedMenuBridge implements MenuBridge {
 
     private static final PlayerInvSlots PLAYER_SLOTS = new PlayerInvSlots(
@@ -29,16 +31,16 @@ public final class SharedMenuBridge implements MenuBridge {
         AbstractContainerMenu menu = sp.containerMenu;
         String typeKey = "minecraft:generic_9x3";
         if (menu.getType() != null) {
-            Object key = Reflect.invoke(MenuType.class, "getKey", new Class<?>[]{MenuType.class}, menu.getType());
+            Object key = invoke(MenuType.class, "getKey", new Class<?>[]{MenuType.class}, menu.getType());
             if (key == null) {
-                key = Reflect.invoke(menu.getType(), "toString");
+                key = invoke(menu.getType(), "toString");
             }
             if (key != null) {
                 typeKey = String.valueOf(key);
             }
         }
         Component title = Component.empty();
-        Object titleObj = Reflect.invoke(menu, "getTitle", "title");
+        Object titleObj = invoke(menu, "getTitle", "title");
         if (titleObj instanceof net.minecraft.network.chat.Component nmsTitle) {
             title = io.papermc.paper.adventure.PaperAdventure.asAdventure(nmsTitle);
         }

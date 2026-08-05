@@ -22,6 +22,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.mastersmp.packet.nms.PacketBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedPacketBridge implements PacketBridge {
 
     @Override
@@ -47,11 +51,11 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public int entityId(Object packet) {
-        Object value = Reflect.invoke(packet, "getEntityId", "id", "entityId", "getId");
+        Object value = invoke(packet, "getEntityId", "id", "entityId", "getId");
         if (value instanceof Integer i) {
             return i;
         }
-        Object field = Reflect.get(Reflect.field(packet.getClass(), "id", "entityId"), packet);
+        Object field = get(field(packet.getClass(), "id", "entityId"), packet);
         return field instanceof Integer i ? i : -1;
     }
 

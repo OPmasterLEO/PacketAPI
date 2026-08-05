@@ -8,6 +8,10 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.mastersmp.packet.nms.MenuBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedMenuBridge implements MenuBridge {
 
     private static final PlayerInvSlots PLAYER_SLOTS = new PlayerInvSlots(
@@ -20,15 +24,15 @@ public final class SharedMenuBridge implements MenuBridge {
             return null;
         }
         ServerPlayer sp = craft.getHandle();
-        Object menu = Reflect.invoke(sp, "containerMenu", "container");
+        Object menu = invoke(sp, "containerMenu", "container");
         if (menu == null) {
-            menu = Reflect.get(Reflect.field(sp.getClass(), "containerMenu", "activeContainer"), sp);
+            menu = get(field(sp.getClass(), "containerMenu", "activeContainer"), sp);
         }
         if (menu == null) {
             return null;
         }
-        Object id = Reflect.get(Reflect.field(menu.getClass(), "containerId", "windowId"), menu);
-        Object slots = Reflect.get(Reflect.field(menu.getClass(), "slots", "items"), menu);
+        Object id = get(field(menu.getClass(), "containerId", "windowId"), menu);
+        Object slots = get(field(menu.getClass(), "slots", "items"), menu);
         int slotCount = slots instanceof java.util.Collection<?> c ? c.size() : 0;
         return new MenuInfo(id instanceof Integer i ? i : 0, "minecraft:generic_9x3", Component.empty(), slotCount);
     }

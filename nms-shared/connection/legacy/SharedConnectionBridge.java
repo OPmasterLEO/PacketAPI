@@ -9,6 +9,9 @@ import net.minecraft.server.NMS.NetworkManager;
 import net.minecraft.server.NMS.PlayerConnection;
 import org.mastersmp.packet.nms.ConnectionBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+
 public final class SharedConnectionBridge implements ConnectionBridge {
 
     private static final String[] ANCHORS = {
@@ -26,7 +29,7 @@ public final class SharedConnectionBridge implements ConnectionBridge {
             return null;
         }
         NetworkManager manager = sp.playerConnection.networkManager;
-        Object channel = Reflect.get(Reflect.field(manager.getClass(), "channel"), manager);
+        Object channel = get(field(manager.getClass(), "channel"), manager);
         return channel instanceof Channel c ? c : null;
     }
 

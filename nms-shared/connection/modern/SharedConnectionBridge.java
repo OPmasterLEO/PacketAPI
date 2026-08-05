@@ -10,6 +10,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.mastersmp.packet.nms.ConnectionBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.field;
+import static org.mastersmp.packet.nms.shared.Reflect.get;
+
 public final class SharedConnectionBridge implements ConnectionBridge {
 
     private static final String[] ANCHORS = {
@@ -63,7 +66,7 @@ public final class SharedConnectionBridge implements ConnectionBridge {
         if (sp.connection instanceof ServerGamePacketListenerImpl listener) {
             return listener.connection;
         }
-        Object value = Reflect.get(Reflect.field(sp.connection.getClass(), "connection"), sp.connection);
+        Object value = get(field(sp.connection.getClass(), "connection"), sp.connection);
         return value instanceof Connection connection ? connection : null;
     }
 

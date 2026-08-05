@@ -4,7 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import org.mastersmp.packet.PacketAPI;
 
-public final class MasterPacketPlugin extends JavaPlugin {
+public final class PacketPlugin extends JavaPlugin {
 
     private PacketAPI api;
 

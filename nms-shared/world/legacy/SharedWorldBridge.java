@@ -8,6 +8,8 @@ import org.bukkit.entity.Entity;
 
 import org.mastersmp.packet.nms.WorldBridge;
 
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+
 public final class SharedWorldBridge implements WorldBridge {
 
     @Override
@@ -75,7 +77,7 @@ public final class SharedWorldBridge implements WorldBridge {
         if (entityHandle instanceof Entity entity) {
             return entity;
         }
-        Object bukkit = Reflect.invoke(entityHandle, "getBukkitEntity");
+        Object bukkit = invoke(entityHandle, "getBukkitEntity");
         return bukkit instanceof Entity entity ? entity : null;
     }
 }
