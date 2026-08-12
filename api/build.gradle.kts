@@ -12,7 +12,7 @@ java {
 
 dependencies {
     api(project(":nms-api"))
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${property("paperApiVersion")}")
     compileOnly("net.kyori:adventure-api:4.17.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.17.0")
     testImplementation(platform("org.junit:junit-bom:6.1.2"))

@@ -115,55 +115,36 @@ public final class SharedPacketBridge implements PacketBridge {
     }
 
     @Override
-    public Object addEntity(
-            int entityId,
-            UUID uuid,
-            double x,
-            double y,
-            double z,
-            float pitch,
-            float yaw,
-            Object nmsEntityType,
-            int data,
-            double vx,
-            double vy,
-            double vz,
-            double headYaw
-    ) {
-        EntityType<?> type = nmsEntityType instanceof EntityType<?> entityType ? entityType : EntityType.ARMOR_STAND;
+    public Object addEntity(PacketViews.AddEntitySpec spec) {
+        EntityType<?> type = spec.nmsEntityType() instanceof EntityType<?> entityType
+                ? entityType
+                : EntityType.ARMOR_STAND;
+        PacketViews.EntityPose pose = spec.pose();
+        PacketViews.Vec3d velocity = spec.velocity();
         return new ClientboundAddEntityPacket(
-                entityId,
-                uuid,
-                x,
-                y,
-                z,
-                pitch,
-                yaw,
+                spec.entityId(),
+                spec.uuid(),
+                pose.x(),
+                pose.y(),
+                pose.z(),
+                pose.pitch(),
+                pose.yaw(),
                 type,
-                data,
-                new Vec3(vx, vy, vz),
-                headYaw
+                spec.data(),
+                new Vec3(velocity.x(), velocity.y(), velocity.z()),
+                spec.headYaw()
         );
     }
 
     @Override
-    public Object addTextDisplay(
-            int entityId,
-            double x,
-            double y,
-            double z,
-            Component text,
-            int lineWidth,
-            int backgroundColor,
-            byte textOpacity,
-            boolean seeThrough
-    ) {
+    public Object addTextDisplay(PacketViews.TextDisplaySpec spec) {
+        PacketViews.Vec3d pos = spec.pos();
         return new ClientboundAddEntityPacket(
-                entityId,
+                spec.entityId(),
                 UUID.randomUUID(),
-                x,
-                y,
-                z,
+                pos.x(),
+                pos.y(),
+                pos.z(),
                 0f,
                 0f,
                 EntityType.TEXT_DISPLAY,

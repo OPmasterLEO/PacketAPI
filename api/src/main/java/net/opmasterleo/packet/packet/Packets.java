@@ -75,27 +75,12 @@ public final class Packets {
         return players.handle(player);
     }
 
-    public void spawnTextDisplay(
-            Player player,
-            int entityId,
-            double x,
-            double y,
-            double z,
-            Component text,
-            int lineWidth,
-            int backgroundColor,
-            byte textOpacity,
-            boolean seeThrough
-    ) {
-        Object add = packets.addTextDisplay(
-                entityId, x, y, z, text, lineWidth, backgroundColor, textOpacity, seeThrough
-        );
+    public void spawnTextDisplay(Player player, PacketViews.TextDisplaySpec spec) {
+        Object add = packets.addTextDisplay(spec);
+        PacketViews.TextDisplayStyle style = spec.style();
         Object data;
         try {
-            data = packets.setEntityData(
-                    entityId,
-                    metadata.textDisplayValues(text, lineWidth, backgroundColor, textOpacity, seeThrough)
-            );
+            data = packets.setEntityData(spec.entityId(), metadata.textDisplayValues(style));
         } catch (RuntimeException ignored) {
             send(player, add);
             return;

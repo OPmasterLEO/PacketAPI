@@ -2,6 +2,10 @@ package net.opmasterleo.packet.nms.shared;
 
 import java.lang.reflect.Field;
 
+/**
+ * Reflection helpers for public Mojang-mapped members and mid/legacy private NMS fields.
+ * Prefer {@link Class#getField(String)} / {@link Class#getMethod} when possible.
+ */
 final class Reflect {
 
     private Reflect() {
@@ -10,8 +14,17 @@ final class Reflect {
     static Field field(Class<?> owner, String... names) {
         for (String name : names) {
             try {
+                return owner.getField(name);
+            } catch (NoSuchFieldException ignored) {
+            }
+            try {
                 Field field = owner.getDeclaredField(name);
-                field.setAccessible(true);
+                // Mid/legacy CraftBukkit fields are not public; Module opens are unavailable at runtime.
+                try {
+                    field.trySetAccessible();
+                } catch (SecurityException ignored) {
+                    continue;
+                }
                 return field;
             } catch (NoSuchFieldException ignored) {
             }

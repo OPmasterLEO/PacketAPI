@@ -45,13 +45,7 @@ public interface NmsAdapter {
         }
 
         @Override
-        public java.util.List<?> textDisplayValues(
-                net.kyori.adventure.text.Component text,
-                int lineWidth,
-                int backgroundColor,
-                byte textOpacity,
-                boolean seeThrough
-        ) {
+        public java.util.List<?> textDisplayValues(net.opmasterleo.packet.nms.packet.PacketViews.TextDisplayStyle style) {
             throw new UnsupportedOperationException("metadata");
         }
 

@@ -34,35 +34,11 @@ public interface PacketBridge {
         throw unsupported("bundle");
     }
 
-    default Object addEntity(
-            int entityId,
-            UUID uuid,
-            double x,
-            double y,
-            double z,
-            float pitch,
-            float yaw,
-            Object nmsEntityType,
-            int data,
-            double vx,
-            double vy,
-            double vz,
-            double headYaw
-    ) {
+    default Object addEntity(PacketViews.AddEntitySpec spec) {
         throw unsupported("addEntity");
     }
 
-    default Object addTextDisplay(
-            int entityId,
-            double x,
-            double y,
-            double z,
-            Component text,
-            int lineWidth,
-            int backgroundColor,
-            byte textOpacity,
-            boolean seeThrough
-    ) {
+    default Object addTextDisplay(PacketViews.TextDisplaySpec spec) {
         throw unsupported("addTextDisplay");
     }
 
