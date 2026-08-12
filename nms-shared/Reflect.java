@@ -43,6 +43,16 @@ final class Reflect {
         }
     }
 
+    static void set(Field field, Object instance, Object value) {
+        if (field == null) {
+            return;
+        }
+        try {
+            field.set(instance, value);
+        } catch (IllegalAccessException ignored) {
+        }
+    }
+
     static Object invoke(Object target, String name, Class<?>[] types, Object... args) {
         if (target == null) {
             return null;

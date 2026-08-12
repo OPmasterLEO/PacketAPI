@@ -11,10 +11,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.opmasterleo.packet.nms.ItemBridge;
 
 public final class SharedItemBridge implements ItemBridge {
@@ -41,17 +41,33 @@ public final class SharedItemBridge implements ItemBridge {
             return List.of();
         }
         ItemMeta meta = bukkit.getItemMeta();
-        if (meta == null || meta.lore() == null) {
+        if (meta == null || !meta.hasLore()) {
             return List.of();
         }
-        return List.copyOf(meta.lore());
+        List<String> lore = meta.getLore();
+        if (lore == null || lore.isEmpty()) {
+            return List.of();
+        }
+        List<Component> out = new ArrayList<>(lore.size());
+        for (String line : lore) {
+            out.add(LegacyComponentSerializer.legacySection().deserialize(line));
+        }
+        return List.copyOf(out);
     }
 
     @Override
     public void setLore(Object nmsItem, List<Component> lore) {
         ItemStack bukkit = CraftItemStack.asCraftMirror((net.minecraft.server.NMS.ItemStack) nmsItem);
         ItemMeta meta = bukkit.getItemMeta();
-        meta.lore(lore);
+        if (lore == null) {
+            meta.setLore(null);
+        } else {
+            List<String> lines = new ArrayList<>(lore.size());
+            for (Component line : lore) {
+                lines.add(LegacyComponentSerializer.legacySection().serialize(line));
+            }
+            meta.setLore(lines);
+        }
         bukkit.setItemMeta(meta);
     }
 

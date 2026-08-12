@@ -24,6 +24,7 @@ import net.opmasterleo.packet.nms.PacketBridge;
 import static net.opmasterleo.packet.nms.shared.Reflect.field;
 import static net.opmasterleo.packet.nms.shared.Reflect.get;
 import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.set;
 
 public final class SharedPacketBridge implements PacketBridge {
 
@@ -110,7 +111,24 @@ public final class SharedPacketBridge implements PacketBridge {
     @Override
     public Object blockUpdate(int x, int y, int z, Object nmsBlockState) {
         IBlockData state = nmsBlockState instanceof IBlockData data ? data : Blocks.AIR.getBlockData();
-        return new PacketPlayOutBlockChange(new BlockPosition(x, y, z), state);
+        BlockPosition pos = new BlockPosition(x, y, z);
+        // 1.16.5+: (BlockPosition, IBlockData). 1.16.1: only (IBlockAccess, BlockPosition).
+        try {
+            return PacketPlayOutBlockChange.class
+                    .getConstructor(BlockPosition.class, IBlockData.class)
+                    .newInstance(pos, state);
+        } catch (ReflectiveOperationException ignored) {
+        }
+        try {
+            PacketPlayOutBlockChange packet = PacketPlayOutBlockChange.class
+                    .getDeclaredConstructor()
+                    .newInstance();
+            set(field(PacketPlayOutBlockChange.class, "a"), packet, pos);
+            set(field(PacketPlayOutBlockChange.class, "block"), packet, state);
+            return packet;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Unable to construct PacketPlayOutBlockChange", e);
+        }
     }
 
     @Override
