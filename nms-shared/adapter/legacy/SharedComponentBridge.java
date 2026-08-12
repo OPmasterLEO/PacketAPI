@@ -1,9 +1,9 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.mastersmp.packet.nms.ComponentBridge;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.opmasterleo.packet.nms.ComponentBridge;
 
 public final class SharedComponentBridge implements ComponentBridge {
 
@@ -25,7 +25,7 @@ public final class SharedComponentBridge implements ComponentBridge {
         if (component == null) {
             return false;
         }
-        String plain = PlainTextComponentSerializer.plainText().serialize(component);
+        String plain = LegacyComponentSerializer.legacySection().serialize(component);
         return plain.contains("Worth") || plain.contains("worth");
     }
 }

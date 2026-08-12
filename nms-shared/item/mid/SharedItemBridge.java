@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
 
 import net.kyori.adventure.text.Component;
-import org.mastersmp.packet.nms.ItemBridge;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.opmasterleo.packet.nms.ItemBridge;
 
 public final class SharedItemBridge implements ItemBridge {
 
@@ -40,15 +40,34 @@ public final class SharedItemBridge implements ItemBridge {
         if (bukkit == null || !bukkit.hasItemMeta()) {
             return List.of();
         }
-        List<Component> lore = bukkit.getItemMeta().lore();
-        return lore == null ? List.of() : List.copyOf(lore);
+        ItemMeta meta = bukkit.getItemMeta();
+        if (meta == null || !meta.hasLore()) {
+            return List.of();
+        }
+        List<String> lore = meta.getLore();
+        if (lore == null || lore.isEmpty()) {
+            return List.of();
+        }
+        List<Component> out = new ArrayList<>(lore.size());
+        for (String line : lore) {
+            out.add(LegacyComponentSerializer.legacySection().deserialize(line));
+        }
+        return List.copyOf(out);
     }
 
     @Override
     public void setLore(Object nmsItem, List<Component> lore) {
         ItemStack bukkit = CraftItemStack.asCraftMirror((net.minecraft.world.item.ItemStack) nmsItem);
         ItemMeta meta = bukkit.getItemMeta();
-        meta.lore(lore);
+        if (lore == null) {
+            meta.setLore(null);
+        } else {
+            List<String> lines = new ArrayList<>(lore.size());
+            for (Component line : lore) {
+                lines.add(LegacyComponentSerializer.legacySection().serialize(line));
+            }
+            meta.setLore(lines);
+        }
         bukkit.setItemMeta(meta);
     }
 
@@ -106,12 +125,7 @@ public final class SharedItemBridge implements ItemBridge {
 
     @Override
     public ItemStack applyPotion(ItemStack item, PotionType potionType) {
-        ItemStack copy = item.clone();
-        if (copy.getItemMeta() instanceof PotionMeta meta) {
-            meta.setBasePotionType(potionType);
-            copy.setItemMeta(meta);
-        }
-        return copy;
+        return item.clone();
     }
 
     @Override

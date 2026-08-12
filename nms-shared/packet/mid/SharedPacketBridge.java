@@ -1,18 +1,28 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.World;
-import org.bukkit.craftbukkit.NMS.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
+import net.minecraft.network.protocol.game.ClientboundBlockEventPacket;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCameraPacket;
+import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.opmasterleo.packet.nms.PacketBridge;
 
-import net.kyori.adventure.text.Component;
-import org.mastersmp.packet.nms.PacketBridge;
-
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedPacketBridge implements PacketBridge {
 
@@ -34,11 +44,7 @@ public final class SharedPacketBridge implements PacketBridge {
     @Override
     public int entityId(Object packet) {
         Object value = invoke(packet, "getEntityId", "id", "entityId", "getId");
-        if (value instanceof Integer i) {
-            return i;
-        }
-        Object field = get(field(packet.getClass(), "id", "entityId"), packet);
-        return field instanceof Integer i ? i : -1;
+        return value instanceof Integer i ? i : -1;
     }
 
     @Override
@@ -55,68 +61,82 @@ public final class SharedPacketBridge implements PacketBridge {
     }
 
     @Override
-    public Object rebuildBundle(List<Object> packets) {
-        throw new UnsupportedOperationException("Bundle rebuild is not available on this mid-version adapter");
+    public Object removeEntities(int... entityIds) {
+        return new ClientboundRemoveEntitiesPacket(entityIds);
     }
 
     @Override
-    public Object createAddTextDisplay(
-            int entityId,
-            double x,
-            double y,
-            double z,
-            Component text,
-            int lineWidth,
-            int backgroundColor,
-            byte textOpacity,
-            boolean seeThrough
-    ) {
-        throw new UnsupportedOperationException("Text display packets require 1.19.4+");
-    }
-
-    @Override
-    public Object createRemoveEntities(int... entityIds) {
-        try {
-            Class<?> type = Class.forName("net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket");
-            return type.getConstructor(int[].class).newInstance((Object) entityIds);
-        } catch (ReflectiveOperationException error) {
-            throw new UnsupportedOperationException("RemoveEntities packet unavailable", error);
+    public Object entityEvent(Object nmsEntity, byte event) {
+        if (!(nmsEntity instanceof Entity entity)) {
+            throw new IllegalArgumentException("entityEvent requires net.minecraft.world.entity.Entity");
         }
+        return new ClientboundEntityEventPacket(entity, event);
     }
 
     @Override
-    public Object createSetEntityData(int entityId, List<?> metadataEntries) {
-        throw new UnsupportedOperationException("SetEntityData construction is version-specific on mid adapters");
-    }
-
-    @Override
-    public Object createBlockEvent(World world, int x, int y, int z, Object blockType, int type, int data) {
-        throw new UnsupportedOperationException("BlockEvent construction is version-specific on mid adapters");
-    }
-
-    @Override
-    public Object createContainerSetSlot(int containerId, int stateId, int slot, ItemStack item) {
-        try {
-            Class<?> type = Class.forName("net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket");
-            Object nms = CraftItemStack.asNMSCopy(item);
-            try {
-                return type.getConstructor(int.class, int.class, int.class, nms.getClass()).newInstance(containerId, stateId, slot, nms);
-            } catch (NoSuchMethodException ignored) {
-                return type.getConstructor(int.class, int.class, nms.getClass()).newInstance(containerId, slot, nms);
-            }
-        } catch (ReflectiveOperationException error) {
-            throw new UnsupportedOperationException("ContainerSetSlot unavailable", error);
+    public Object animate(Object nmsEntity, int action) {
+        if (!(nmsEntity instanceof Entity entity)) {
+            throw new IllegalArgumentException("animate requires net.minecraft.world.entity.Entity");
         }
+        return new ClientboundAnimatePacket(entity, action);
     }
 
     @Override
-    public Object createSetHealth(float health, int food, float saturation) {
-        try {
-            Class<?> type = Class.forName("net.minecraft.network.protocol.game.ClientboundSetHealthPacket");
-            return type.getConstructor(float.class, int.class, float.class).newInstance(health, food, saturation);
-        } catch (ReflectiveOperationException error) {
-            throw new UnsupportedOperationException("SetHealth unavailable", error);
+    public Object rotateHead(Object nmsEntity, float yaw) {
+        if (!(nmsEntity instanceof Entity entity)) {
+            throw new IllegalArgumentException("rotateHead requires net.minecraft.world.entity.Entity");
         }
+        return new ClientboundRotateHeadPacket(entity, (byte) Math.floor(yaw * 256.0f / 360.0f));
+    }
+
+    @Override
+    public Object setCamera(Object nmsEntity) {
+        if (!(nmsEntity instanceof Entity entity)) {
+            throw new IllegalArgumentException("setCamera requires net.minecraft.world.entity.Entity");
+        }
+        return new ClientboundSetCameraPacket(entity);
+    }
+
+    @Override
+    public Object setPassengers(Object nmsVehicle) {
+        if (!(nmsVehicle instanceof Entity entity)) {
+            throw new IllegalArgumentException("setPassengers requires net.minecraft.world.entity.Entity");
+        }
+        return new ClientboundSetPassengersPacket(entity);
+    }
+
+    @Override
+    public Object collectItem(int collectedId, int collectorId, int amount) {
+        return new ClientboundTakeItemEntityPacket(collectedId, collectorId, amount);
+    }
+
+    @Override
+    public Object blockUpdate(int x, int y, int z, Object nmsBlockState) {
+        BlockState state = nmsBlockState instanceof BlockState blockState
+                ? blockState
+                : Blocks.AIR.defaultBlockState();
+        return new ClientboundBlockUpdatePacket(new BlockPos(x, y, z), state);
+    }
+
+    @Override
+    public Object blockEvent(int x, int y, int z, Object nmsBlock, int type, int data) {
+        Block block = nmsBlock instanceof Block b ? b : Blocks.ENDER_CHEST;
+        return new ClientboundBlockEventPacket(new BlockPos(x, y, z), block, type, data);
+    }
+
+    @Override
+    public Object blockDestruction(int entityId, int x, int y, int z, int progress) {
+        return new ClientboundBlockDestructionPacket(entityId, new BlockPos(x, y, z), progress);
+    }
+
+    @Override
+    public Object setHealth(float health, int food, float saturation) {
+        return new ClientboundSetHealthPacket(health, food, saturation);
+    }
+
+    @Override
+    public Object setExperience(float progress, int totalXp, int level) {
+        return new ClientboundSetExperiencePacket(progress, totalXp, level);
     }
 
     private static String strip(String value, String prefix, String suffix) {

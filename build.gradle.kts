@@ -8,7 +8,7 @@ plugins {
 val pluginVersion: String by project
 
 allprojects {
-    group = "org.mastersmp.packet"
+    group = "net.opmasterleo.packet"
     version = pluginVersion
 
     repositories {
@@ -47,7 +47,7 @@ dependencies {
     nmsBuckets.forEach { bucket ->
         implementation(project(":nms:$bucket"))
     }
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${property("paperApiVersion")}")
 }
 
 java {
@@ -73,7 +73,7 @@ tasks.shadowJar {
     )
     mergeServiceFiles()
     manifest {
-        attributes["Automatic-Module-Name"] = "org.mastersmp.packet"
+        attributes["Automatic-Module-Name"] = "net.opmasterleo.packet"
         attributes["Implementation-Title"] = "PacketAPI"
         attributes["Implementation-Version"] = project.version
         attributes["paperweight-mappings-namespace"] = "mojang"
@@ -179,6 +179,13 @@ tasks.named("publishApiPublicationToReposiliteReleasesRepository").configure {
     onlyIf { !publishingSnapshot }
 }
 tasks.named("publishApiPublicationToReposiliteSnapshotsRepository").configure {
+    onlyIf { publishingSnapshot }
+}
+
+tasks.named("publishAllPublicationsToReposiliteReleasesRepository").configure {
+    onlyIf { !publishingSnapshot }
+}
+tasks.named("publishAllPublicationsToReposiliteSnapshotsRepository").configure {
     onlyIf { publishingSnapshot }
 }
 

@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
 
 import net.kyori.adventure.text.Component;
-import org.mastersmp.packet.nms.ItemBridge;
+import net.opmasterleo.packet.nms.ItemBridge;
 
 public final class SharedItemBridge implements ItemBridge {
 

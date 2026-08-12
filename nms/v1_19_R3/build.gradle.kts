@@ -11,8 +11,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot:1.19.4-R0.1-SNAPSHOT:remapped-mojang")
     compileOnly("net.kyori:adventure-api:4.17.0")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
-    compileOnly("io.netty:netty-transport:4.1.118.Final")
-    compileOnly("io.netty:netty-handler:4.1.118.Final")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.17.0")
 }
 
 apply(from = rootProject.file("nms/shared-sources.gradle.kts"))

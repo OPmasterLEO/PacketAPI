@@ -1,7 +1,7 @@
 import org.gradle.api.plugins.JavaPluginExtension
 
 val sharedOut = layout.buildDirectory.dir("generated-shared")
-val versionSharedPackage = "org.mastersmp.packet.nms.${project.name}.shared"
+val versionSharedPackage = "net.opmasterleo.packet.nms.${project.name}.shared"
 val versionSharedPath = versionSharedPackage.replace('.', '/')
 val era = project.findProperty("nmsEra")?.toString() ?: "modern"
 val nmsVersion = project.findProperty("nmsVersion")?.toString() ?: project.name
@@ -23,12 +23,14 @@ val parts: SharedParts = when (era) {
     "modern" -> SharedParts("modern", "modern", "modern", "modern", "modern", "modern", "modern")
     "modern21_2" -> SharedParts("modern", "modern", "modern", "modern", "modern", "modern", "modern")
     "modern21_5" -> SharedParts("modern", "modern", "modern", "modern", "modern21_5", "modern", "modern")
-    "modern26" -> SharedParts("modern", "modern", "modern", "modern", "modern21_5", "modern", "modern")
+    "modern26" -> SharedParts("modern", "modern", "modern", "modern26", "modern21_5", "modern", "modern")
+    "modern26_2" -> SharedParts("modern", "modern", "modern", "modern26_2", "modern21_5", "modern", "modern")
     else -> throw GradleException("Unknown nmsEra=$era")
 }
 
 val sharedVariantDirs: List<File> = buildList {
     val root = rootProject.file("nms-shared")
+    add(root)
     add(File(root, "adapter/${parts.adapter}"))
     add(File(root, "connection/${parts.connection}"))
     add(File(root, "player/${parts.player}"))
@@ -56,11 +58,15 @@ val prepareSharedSources = tasks.register("prepareSharedSources") {
                 dest.parentFile.mkdirs()
                 var text = file.readText()
                     .replace(
-                        "package org.mastersmp.packet.nms.shared;",
+                        "package net.opmasterleo.packet.nms.shared;",
                         "package $versionSharedPackage;"
                     )
                     .replace(
-                        "import org.mastersmp.packet.nms.shared.",
+                        "import static net.opmasterleo.packet.nms.shared.",
+                        "import static $versionSharedPackage."
+                    )
+                    .replace(
+                        "import net.opmasterleo.packet.nms.shared.",
                         "import $versionSharedPackage."
                     )
                 if (era.startsWith("legacy")) {

@@ -1,14 +1,14 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
-import org.mastersmp.packet.nms.ComponentBridge;
-import org.mastersmp.packet.nms.ConnectionBridge;
-import org.mastersmp.packet.nms.ItemBridge;
-import org.mastersmp.packet.nms.MenuBridge;
-import org.mastersmp.packet.nms.NmsAdapter;
-import org.mastersmp.packet.nms.PacketBridge;
-import org.mastersmp.packet.nms.PacketWrapper;
-import org.mastersmp.packet.nms.PlayerBridge;
-import org.mastersmp.packet.nms.WorldBridge;
+import net.opmasterleo.packet.nms.ComponentBridge;
+import net.opmasterleo.packet.nms.ConnectionBridge;
+import net.opmasterleo.packet.nms.ItemBridge;
+import net.opmasterleo.packet.nms.MenuBridge;
+import net.opmasterleo.packet.nms.MetadataBridge;
+import net.opmasterleo.packet.nms.NmsAdapter;
+import net.opmasterleo.packet.nms.PacketBridge;
+import net.opmasterleo.packet.nms.PlayerBridge;
+import net.opmasterleo.packet.nms.WorldBridge;
 
 public abstract class AbstractNmsAdapter implements NmsAdapter {
 
@@ -20,7 +20,7 @@ public abstract class AbstractNmsAdapter implements NmsAdapter {
     private final MenuBridge menus = new SharedMenuBridge();
     private final WorldBridge worlds = new SharedWorldBridge();
     private final ComponentBridge components = new SharedComponentBridge();
-    private final PacketWrapper wrapper = new SharedPacketWrapper();
+    private final MetadataBridge metadata = new SharedMetadataBridge(components);
 
     protected AbstractNmsAdapter(String bucketId) {
         this.bucketId = bucketId;
@@ -67,7 +67,7 @@ public abstract class AbstractNmsAdapter implements NmsAdapter {
     }
 
     @Override
-    public PacketWrapper wrapper() {
-        return wrapper;
+    public MetadataBridge metadata() {
+        return metadata;
     }
 }

@@ -6,7 +6,7 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
-extra["nmsEra"] = "modern26"
+extra["nmsEra"] = "modern26_2"
 
 dependencies {
     compileOnly(project(":nms-api"))

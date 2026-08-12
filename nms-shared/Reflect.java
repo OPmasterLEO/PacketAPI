@@ -1,7 +1,12 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
+/**
+ * Reflection helpers for public Mojang-mapped members and mid/legacy private NMS fields.
+ * Prefer {@link Class#getField(String)} / {@link Class#getMethod} when possible.
+ */
 final class Reflect {
 
     private Reflect() {
@@ -10,8 +15,17 @@ final class Reflect {
     static Field field(Class<?> owner, String... names) {
         for (String name : names) {
             try {
+                return owner.getField(name);
+            } catch (NoSuchFieldException ignored) {
+            }
+            try {
                 Field field = owner.getDeclaredField(name);
-                field.setAccessible(true);
+                // Mid/legacy CraftBukkit fields are not public; Module opens are unavailable at runtime.
+                try {
+                    field.trySetAccessible();
+                } catch (SecurityException ignored) {
+                    continue;
+                }
                 return field;
             } catch (NoSuchFieldException ignored) {
             }
@@ -27,6 +41,16 @@ final class Reflect {
             return field.get(instance);
         } catch (IllegalAccessException ignored) {
             return null;
+        }
+    }
+
+    static void set(Field field, Object instance, Object value) {
+        if (field == null) {
+            return;
+        }
+        try {
+            field.set(instance, value);
+        } catch (IllegalAccessException ignored) {
         }
     }
 
@@ -56,5 +80,22 @@ final class Reflect {
             }
         }
         return null;
+    }
+
+    static Object construct(Class<?> type, Class<?>[] paramTypes, Object... args) {
+        if (type == null) {
+            return null;
+        }
+        try {
+            Constructor<?> ctor = type.getDeclaredConstructor(paramTypes);
+            try {
+                ctor.trySetAccessible();
+            } catch (SecurityException ignored) {
+                return null;
+            }
+            return ctor.newInstance(args);
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
     }
 }

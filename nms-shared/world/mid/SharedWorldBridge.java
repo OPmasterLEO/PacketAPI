@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.stream.Stream;
 
@@ -6,9 +6,9 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.NMS.CraftWorld;
 import org.bukkit.entity.Entity;
 
-import org.mastersmp.packet.nms.WorldBridge;
+import net.opmasterleo.packet.nms.WorldBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedWorldBridge implements WorldBridge {
 

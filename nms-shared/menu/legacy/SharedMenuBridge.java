@@ -1,10 +1,10 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.Component;
-import org.mastersmp.packet.nms.MenuBridge;
+import net.opmasterleo.packet.nms.MenuBridge;
 
 public final class SharedMenuBridge implements MenuBridge {
 

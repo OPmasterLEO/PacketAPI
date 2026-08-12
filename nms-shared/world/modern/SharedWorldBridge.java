@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -13,11 +13,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.mastersmp.packet.nms.WorldBridge;
+import net.opmasterleo.packet.nms.WorldBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.field;
+import static net.opmasterleo.packet.nms.shared.Reflect.get;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedWorldBridge implements WorldBridge {
 
@@ -36,12 +36,24 @@ public final class SharedWorldBridge implements WorldBridge {
             return Stream.empty();
         }
         return StreamSupport.stream(serverLevel.getAllEntities().spliterator(), false)
-                .map(entity -> new EntityHandle(
-                        entity,
-                        entity.getId(),
-                        entity.chunkPosition().x,
-                        entity.chunkPosition().z
-                ));
+                .map(entity -> {
+                    Object chunkPos = entity.chunkPosition();
+                    return new EntityHandle(
+                            entity,
+                            entity.getId(),
+                            chunkCoord(chunkPos, "x"),
+                            chunkCoord(chunkPos, "z")
+                    );
+                });
+    }
+
+    private static int chunkCoord(Object chunkPos, String name) {
+        Object value = invoke(chunkPos, name, "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1));
+        if (value instanceof Integer i) {
+            return i;
+        }
+        Object fieldValue = get(field(chunkPos.getClass(), name), chunkPos);
+        return fieldValue instanceof Integer i ? i : 0;
     }
 
     @Override
