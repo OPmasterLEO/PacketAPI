@@ -15,6 +15,9 @@ Modern, versioned access to the Minecraft protocol through **direct NMS** (`Craf
 ## Send a packet
 
 ```java
+import net.opmasterleo.packet.PacketAPI;
+import net.kyori.adventure.text.Component;
+
 PacketAPI api = PacketAPI.get();
 Object handle = api.adapter().players().handle(player); // ServerPlayer
 api.packets().setHealth(player, 20f, 20, 5f);
@@ -24,6 +27,9 @@ api.packets().systemChat(player, Component.text("hello"), false);
 Listen without touching Netty:
 
 ```java
+import net.opmasterleo.packet.event.PacketSendEvent;
+import net.opmasterleo.packet.event.NmsPlayerJoinEvent;
+
 @EventHandler
 public void onPacket(PacketSendEvent event) {
     if (event.getPacketName().contains("SetHealth")) {

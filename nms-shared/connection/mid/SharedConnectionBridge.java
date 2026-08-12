@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import org.bukkit.craftbukkit.NMS.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -6,11 +6,11 @@ import org.bukkit.entity.Player;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import org.mastersmp.packet.nms.ConnectionBridge;
+import net.opmasterleo.packet.nms.ConnectionBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.field;
+import static net.opmasterleo.packet.nms.shared.Reflect.get;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedConnectionBridge implements ConnectionBridge {
 

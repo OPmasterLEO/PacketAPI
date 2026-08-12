@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -13,11 +13,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.mastersmp.packet.nms.WorldBridge;
+import net.opmasterleo.packet.nms.WorldBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.field;
+import static net.opmasterleo.packet.nms.shared.Reflect.get;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedWorldBridge implements WorldBridge {
 

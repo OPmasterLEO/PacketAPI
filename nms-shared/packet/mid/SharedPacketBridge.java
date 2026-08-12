@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +20,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.mastersmp.packet.nms.PacketBridge;
+import net.opmasterleo.packet.nms.PacketBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedPacketBridge implements PacketBridge {
 

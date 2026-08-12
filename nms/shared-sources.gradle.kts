@@ -1,7 +1,7 @@
 import org.gradle.api.plugins.JavaPluginExtension
 
 val sharedOut = layout.buildDirectory.dir("generated-shared")
-val versionSharedPackage = "org.mastersmp.packet.nms.${project.name}.shared"
+val versionSharedPackage = "net.opmasterleo.packet.nms.${project.name}.shared"
 val versionSharedPath = versionSharedPackage.replace('.', '/')
 val era = project.findProperty("nmsEra")?.toString() ?: "modern"
 val nmsVersion = project.findProperty("nmsVersion")?.toString() ?: project.name
@@ -57,15 +57,15 @@ val prepareSharedSources = tasks.register("prepareSharedSources") {
                 dest.parentFile.mkdirs()
                 var text = file.readText()
                     .replace(
-                        "package org.mastersmp.packet.nms.shared;",
+                        "package net.opmasterleo.packet.nms.shared;",
                         "package $versionSharedPackage;"
                     )
                     .replace(
-                        "import static org.mastersmp.packet.nms.shared.",
+                        "import static net.opmasterleo.packet.nms.shared.",
                         "import static $versionSharedPackage."
                     )
                     .replace(
-                        "import org.mastersmp.packet.nms.shared.",
+                        "import net.opmasterleo.packet.nms.shared.",
                         "import $versionSharedPackage."
                     )
                 if (era.startsWith("legacy")) {

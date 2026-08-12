@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,10 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
-import org.mastersmp.packet.nms.ComponentBridge;
-import org.mastersmp.packet.nms.MetadataBridge;
+import net.opmasterleo.packet.nms.ComponentBridge;
+import net.opmasterleo.packet.nms.MetadataBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedMetadataBridge implements MetadataBridge {
 

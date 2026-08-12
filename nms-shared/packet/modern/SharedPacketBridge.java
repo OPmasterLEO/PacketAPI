@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -50,14 +50,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.mastersmp.packet.nms.PacketBridge;
-import org.mastersmp.packet.nms.packet.BlockPosView;
-import org.mastersmp.packet.nms.packet.Hand;
-import org.mastersmp.packet.nms.packet.InteractAction;
-import org.mastersmp.packet.nms.packet.PacketViews;
-import org.mastersmp.packet.nms.packet.PlayerActionType;
+import net.opmasterleo.packet.nms.PacketBridge;
+import net.opmasterleo.packet.nms.packet.BlockPosView;
+import net.opmasterleo.packet.nms.packet.Hand;
+import net.opmasterleo.packet.nms.packet.InteractAction;
+import net.opmasterleo.packet.nms.packet.PacketViews;
+import net.opmasterleo.packet.nms.packet.PlayerActionType;
 
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedPacketBridge implements PacketBridge {
 

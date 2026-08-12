@@ -1,8 +1,8 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.mastersmp.packet.nms.ComponentBridge;
+import net.opmasterleo.packet.nms.ComponentBridge;
 
 public final class SharedComponentBridge implements ComponentBridge {
 

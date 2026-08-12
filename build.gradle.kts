@@ -8,7 +8,7 @@ plugins {
 val pluginVersion: String by project
 
 allprojects {
-    group = "org.mastersmp.packet"
+    group = "net.opmasterleo.packet"
     version = pluginVersion
 
     repositories {
@@ -73,7 +73,7 @@ tasks.shadowJar {
     )
     mergeServiceFiles()
     manifest {
-        attributes["Automatic-Module-Name"] = "org.mastersmp.packet"
+        attributes["Automatic-Module-Name"] = "net.opmasterleo.packet"
         attributes["Implementation-Title"] = "PacketAPI"
         attributes["Implementation-Version"] = project.version
         attributes["paperweight-mappings-namespace"] = "mojang"

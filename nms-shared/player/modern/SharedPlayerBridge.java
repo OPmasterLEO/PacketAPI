@@ -1,11 +1,11 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
-import org.mastersmp.packet.nms.PlayerBridge;
+import net.opmasterleo.packet.nms.PlayerBridge;
 
 public final class SharedPlayerBridge implements PlayerBridge {
 

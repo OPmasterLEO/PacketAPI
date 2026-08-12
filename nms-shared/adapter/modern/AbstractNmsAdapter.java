@@ -1,14 +1,14 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
-import org.mastersmp.packet.nms.ComponentBridge;
-import org.mastersmp.packet.nms.ConnectionBridge;
-import org.mastersmp.packet.nms.ItemBridge;
-import org.mastersmp.packet.nms.MenuBridge;
-import org.mastersmp.packet.nms.MetadataBridge;
-import org.mastersmp.packet.nms.NmsAdapter;
-import org.mastersmp.packet.nms.PacketBridge;
-import org.mastersmp.packet.nms.PlayerBridge;
-import org.mastersmp.packet.nms.WorldBridge;
+import net.opmasterleo.packet.nms.ComponentBridge;
+import net.opmasterleo.packet.nms.ConnectionBridge;
+import net.opmasterleo.packet.nms.ItemBridge;
+import net.opmasterleo.packet.nms.MenuBridge;
+import net.opmasterleo.packet.nms.MetadataBridge;
+import net.opmasterleo.packet.nms.NmsAdapter;
+import net.opmasterleo.packet.nms.PacketBridge;
+import net.opmasterleo.packet.nms.PlayerBridge;
+import net.opmasterleo.packet.nms.WorldBridge;
 
 public abstract class AbstractNmsAdapter implements NmsAdapter {
 

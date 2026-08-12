@@ -1,4 +1,4 @@
-package org.mastersmp.packet.nms.shared;
+package net.opmasterleo.packet.nms.shared;
 
 import java.util.List;
 
@@ -19,11 +19,11 @@ import net.minecraft.server.NMS.PacketPlayOutEntityStatus;
 import net.minecraft.server.NMS.PacketPlayOutExperience;
 import net.minecraft.server.NMS.PacketPlayOutMount;
 import net.minecraft.server.NMS.PacketPlayOutUpdateHealth;
-import org.mastersmp.packet.nms.PacketBridge;
+import net.opmasterleo.packet.nms.PacketBridge;
 
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
-import static org.mastersmp.packet.nms.shared.Reflect.invoke;
+import static net.opmasterleo.packet.nms.shared.Reflect.field;
+import static net.opmasterleo.packet.nms.shared.Reflect.get;
+import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedPacketBridge implements PacketBridge {
 
