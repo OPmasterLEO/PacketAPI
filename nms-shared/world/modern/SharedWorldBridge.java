@@ -36,12 +36,24 @@ public final class SharedWorldBridge implements WorldBridge {
             return Stream.empty();
         }
         return StreamSupport.stream(serverLevel.getAllEntities().spliterator(), false)
-                .map(entity -> new EntityHandle(
-                        entity,
-                        entity.getId(),
-                        entity.chunkPosition().x,
-                        entity.chunkPosition().z
-                ));
+                .map(entity -> {
+                    Object chunkPos = entity.chunkPosition();
+                    return new EntityHandle(
+                            entity,
+                            entity.getId(),
+                            chunkCoord(chunkPos, "x"),
+                            chunkCoord(chunkPos, "z")
+                    );
+                });
+    }
+
+    private static int chunkCoord(Object chunkPos, String name) {
+        Object value = invoke(chunkPos, name, "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1));
+        if (value instanceof Integer i) {
+            return i;
+        }
+        Object fieldValue = get(field(chunkPos.getClass(), name), chunkPos);
+        return fieldValue instanceof Integer i ? i : 0;
     }
 
     @Override

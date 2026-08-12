@@ -57,6 +57,9 @@ import net.opmasterleo.packet.nms.packet.InteractAction;
 import net.opmasterleo.packet.nms.packet.PacketViews;
 import net.opmasterleo.packet.nms.packet.PlayerActionType;
 
+import static net.opmasterleo.packet.nms.shared.Reflect.constructSetTime;
+import static net.opmasterleo.packet.nms.shared.Reflect.field;
+import static net.opmasterleo.packet.nms.shared.Reflect.get;
 import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedPacketBridge implements PacketBridge {
@@ -78,23 +81,16 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public int entityId(Object packet) {
-        if (packet instanceof ClientboundAddEntityPacket add) {
-            return add.getId();
+        if (packet == null) {
+            return -1;
         }
-        if (packet instanceof ClientboundSetEntityDataPacket data) {
-            return data.id();
+        // Method names drift across modern buckets (id/getId/getEntity/getEntityId).
+        Object value = invoke(packet, "getEntityId", "getEntity", "getId", "id", "entityId");
+        if (value instanceof Integer i) {
+            return i;
         }
-        if (packet instanceof ClientboundSetEquipmentPacket equipment) {
-            return equipment.getEntity();
-        }
-        if (packet instanceof ClientboundSetEntityMotionPacket motion) {
-            return motion.getId();
-        }
-        if (packet instanceof ServerboundInteractPacket interact) {
-            return interact.getEntityId();
-        }
-        Object value = invoke(packet, "getEntityId", "id", "entityId", "getId");
-        return value instanceof Integer i ? i : -1;
+        Object fieldValue = get(field(packet.getClass(), "id", "entityId", "entity"), packet);
+        return fieldValue instanceof Integer i ? i : -1;
     }
 
     @Override
@@ -254,7 +250,11 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public Object setTime(long gameTime, long dayTime) {
-        return new ClientboundSetTimePacket(gameTime, dayTime, true);
+        Object packet = constructSetTime(ClientboundSetTimePacket.class, gameTime, dayTime);
+        if (packet == null) {
+            throw new IllegalStateException("Unable to construct ClientboundSetTimePacket");
+        }
+        return packet;
     }
 
     @Override
@@ -339,8 +339,9 @@ public final class SharedPacketBridge implements PacketBridge {
         if (!(packet instanceof ServerboundInteractPacket interact)) {
             return PacketBridge.super.interact(packet);
         }
-        InteractAction action = interact.isAttack() ? InteractAction.ATTACK : InteractAction.INTERACT;
-        return new PacketViews.InteractView(interact.getEntityId(), action, Hand.MAIN_HAND);
+        boolean attack = Boolean.TRUE.equals(invoke(interact, "isAttack"));
+        InteractAction action = attack ? InteractAction.ATTACK : InteractAction.INTERACT;
+        return new PacketViews.InteractView(entityId(interact), action, Hand.MAIN_HAND);
     }
 
     @Override
@@ -353,14 +354,17 @@ public final class SharedPacketBridge implements PacketBridge {
     }
 
     private static PlayerActionType playerActionType(ServerboundPlayerActionPacket.Action action) {
-        return switch (action) {
-            case START_DESTROY_BLOCK -> PlayerActionType.START_DESTROY_BLOCK;
-            case ABORT_DESTROY_BLOCK -> PlayerActionType.ABORT_DESTROY_BLOCK;
-            case STOP_DESTROY_BLOCK -> PlayerActionType.STOP_DESTROY_BLOCK;
-            case DROP_ALL_ITEMS -> PlayerActionType.DROP_ALL_ITEMS;
-            case DROP_ITEM -> PlayerActionType.DROP_ITEM;
-            case RELEASE_USE_ITEM -> PlayerActionType.RELEASE_USE_ITEM;
-            case SWAP_ITEM_WITH_OFFHAND -> PlayerActionType.SWAP_ITEM_WITH_OFFHAND;
+        // String switch keeps older modern buckets compiling when newer enums add values (e.g. STAB).
+        return switch (action.name()) {
+            case "START_DESTROY_BLOCK" -> PlayerActionType.START_DESTROY_BLOCK;
+            case "ABORT_DESTROY_BLOCK" -> PlayerActionType.ABORT_DESTROY_BLOCK;
+            case "STOP_DESTROY_BLOCK" -> PlayerActionType.STOP_DESTROY_BLOCK;
+            case "DROP_ALL_ITEMS" -> PlayerActionType.DROP_ALL_ITEMS;
+            case "DROP_ITEM" -> PlayerActionType.DROP_ITEM;
+            case "RELEASE_USE_ITEM" -> PlayerActionType.RELEASE_USE_ITEM;
+            case "SWAP_ITEM_WITH_OFFHAND" -> PlayerActionType.SWAP_ITEM_WITH_OFFHAND;
+            case "STAB" -> PlayerActionType.UNKNOWN;
+            default -> PlayerActionType.UNKNOWN;
         };
     }
 
