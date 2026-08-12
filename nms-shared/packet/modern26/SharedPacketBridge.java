@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import com.mojang.datafixers.util.Pair;
@@ -249,7 +250,8 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public Object setTime(long gameTime, long dayTime) {
-        return new ClientboundSetTimePacket(gameTime, dayTime, true);
+        // 26.x replaced (gameTime, dayTime, tickDayTime) with (gameTime, clockUpdates).
+        return new ClientboundSetTimePacket(gameTime, Map.of());
     }
 
     @Override

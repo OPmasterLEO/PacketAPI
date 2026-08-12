@@ -23,7 +23,8 @@ val parts: SharedParts = when (era) {
     "modern" -> SharedParts("modern", "modern", "modern", "modern", "modern", "modern", "modern")
     "modern21_2" -> SharedParts("modern", "modern", "modern", "modern", "modern", "modern", "modern")
     "modern21_5" -> SharedParts("modern", "modern", "modern", "modern", "modern21_5", "modern", "modern")
-    "modern26" -> SharedParts("modern", "modern", "modern", "modern", "modern21_5", "modern", "modern")
+    "modern26" -> SharedParts("modern", "modern", "modern", "modern26", "modern21_5", "modern", "modern")
+    "modern26_2" -> SharedParts("modern", "modern", "modern", "modern26_2", "modern21_5", "modern", "modern")
     else -> throw GradleException("Unknown nmsEra=$era")
 }
 

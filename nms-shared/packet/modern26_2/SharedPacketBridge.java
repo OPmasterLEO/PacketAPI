@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import com.mojang.datafixers.util.Pair;
@@ -45,6 +46,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -113,7 +115,7 @@ public final class SharedPacketBridge implements PacketBridge {
     public Object addEntity(PacketViews.AddEntitySpec spec) {
         EntityType<?> type = spec.nmsEntityType() instanceof EntityType<?> provided
                 ? provided
-                : EntityType.ARMOR_STAND;
+                : EntityTypes.ARMOR_STAND;
         PacketViews.EntityPose pose = spec.pose();
         PacketViews.Vec3d velocity = spec.velocity();
         return new ClientboundAddEntityPacket(
@@ -142,7 +144,7 @@ public final class SharedPacketBridge implements PacketBridge {
                 pos.z(),
                 0f,
                 0f,
-                EntityType.TEXT_DISPLAY,
+                EntityTypes.TEXT_DISPLAY,
                 0,
                 Vec3.ZERO,
                 0.0
@@ -249,7 +251,8 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public Object setTime(long gameTime, long dayTime) {
-        return new ClientboundSetTimePacket(gameTime, dayTime, true);
+        // 26.x replaced (gameTime, dayTime, tickDayTime) with (gameTime, clockUpdates).
+        return new ClientboundSetTimePacket(gameTime, Map.of());
     }
 
     @Override
