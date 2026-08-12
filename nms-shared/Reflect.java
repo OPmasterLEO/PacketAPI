@@ -137,4 +137,26 @@ final class Reflect {
         }
         return null;
     }
+
+    /**
+     * Resolve built-in entity types across modern API drift:
+     * pre-26.2 constants live on {@code EntityType}, 26.2+ on {@code EntityTypes}.
+     */
+    @SuppressWarnings("unchecked")
+    static <T> T entityType(String name) {
+        for (String owner : new String[]{
+                "net.minecraft.world.entity.EntityType",
+                "net.minecraft.world.entity.EntityTypes"
+        }) {
+            try {
+                Class<?> type = Class.forName(owner);
+                Object value = get(field(type, name), null);
+                if (value != null) {
+                    return (T) value;
+                }
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        throw new IllegalStateException("Missing EntityType constant: " + name);
+    }
 }

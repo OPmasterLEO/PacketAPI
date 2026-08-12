@@ -58,6 +58,7 @@ import net.opmasterleo.packet.nms.packet.PacketViews;
 import net.opmasterleo.packet.nms.packet.PlayerActionType;
 
 import static net.opmasterleo.packet.nms.shared.Reflect.constructSetTime;
+import static net.opmasterleo.packet.nms.shared.Reflect.entityType;
 import static net.opmasterleo.packet.nms.shared.Reflect.field;
 import static net.opmasterleo.packet.nms.shared.Reflect.get;
 import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
@@ -112,9 +113,9 @@ public final class SharedPacketBridge implements PacketBridge {
 
     @Override
     public Object addEntity(PacketViews.AddEntitySpec spec) {
-        EntityType<?> type = spec.nmsEntityType() instanceof EntityType<?> entityType
-                ? entityType
-                : EntityType.ARMOR_STAND;
+        EntityType<?> type = spec.nmsEntityType() instanceof EntityType<?> provided
+                ? provided
+                : entityType("ARMOR_STAND");
         PacketViews.EntityPose pose = spec.pose();
         PacketViews.Vec3d velocity = spec.velocity();
         return new ClientboundAddEntityPacket(
@@ -143,7 +144,7 @@ public final class SharedPacketBridge implements PacketBridge {
                 pos.z(),
                 0f,
                 0f,
-                EntityType.TEXT_DISPLAY,
+                entityType("TEXT_DISPLAY"),
                 0,
                 Vec3.ZERO,
                 0.0
