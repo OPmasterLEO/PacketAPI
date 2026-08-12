@@ -1,22 +1,19 @@
 package org.mastersmp.packet.nms;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.inventory.ItemStack;
-
 import net.kyori.adventure.text.Component;
-import org.mastersmp.packet.nms.packet.BlockPosView;
 import org.mastersmp.packet.nms.packet.Hand;
 import org.mastersmp.packet.nms.packet.InteractAction;
 import org.mastersmp.packet.nms.packet.PacketViews;
 import org.mastersmp.packet.nms.packet.PlayerActionType;
 
+/**
+ * Direct NMS packet factory. Menu/container/sign packets are owned by PacketUxUi / SignGUI
+ * and are not duplicated. Methods without a default must be implemented for every era;
+ * the rest throw unless that protocol layout exists on the running version.
+ */
 public interface PacketBridge {
 
     String classify(Object packet);
@@ -25,9 +22,37 @@ public interface PacketBridge {
 
     List<Object> unwrapBundle(Object packet);
 
-    Object rebuildBundle(List<Object> packets);
+    default boolean clientbound(Object packet) {
+        if (packet == null) {
+            return false;
+        }
+        String name = packet.getClass().getSimpleName();
+        return name.startsWith("Clientbound") || name.startsWith("PacketPlayOut");
+    }
 
-    Object createAddTextDisplay(
+    default Object rebuildBundle(List<Object> packets) {
+        throw unsupported("bundle");
+    }
+
+    default Object addEntity(
+            int entityId,
+            UUID uuid,
+            double x,
+            double y,
+            double z,
+            float pitch,
+            float yaw,
+            Object nmsEntityType,
+            int data,
+            double vx,
+            double vy,
+            double vz,
+            double headYaw
+    ) {
+        throw unsupported("addEntity");
+    }
+
+    default Object addTextDisplay(
             int entityId,
             double x,
             double y,
@@ -37,227 +62,125 @@ public interface PacketBridge {
             int backgroundColor,
             byte textOpacity,
             boolean seeThrough
-    );
-
-    Object createRemoveEntities(int... entityIds);
-
-    Object createSetEntityData(int entityId, List<?> metadataEntries);
-
-    Object createBlockEvent(World world, int x, int y, int z, Object blockType, int type, int data);
-
-    Object createContainerSetSlot(int containerId, int stateId, int slot, ItemStack item);
-
-    Object createSetHealth(float health, int food, float saturation);
-
-    default int interactEntityId(Object packet) {
-        return entityId(packet);
+    ) {
+        throw unsupported("addTextDisplay");
     }
 
-    default InteractAction interactAction(Object packet) {
-        return InteractAction.UNKNOWN;
+    Object removeEntities(int... entityIds);
+
+    default Object setEntityData(int entityId, List<?> metadataEntries) {
+        throw unsupported("setEntityData");
+    }
+
+    default Object entityVelocity(int entityId, double vx, double vy, double vz) {
+        throw unsupported("entityVelocity");
+    }
+
+    default Object entityEvent(Object nmsEntity, byte event) {
+        throw unsupported("entityEvent");
+    }
+
+    default Object animate(Object nmsEntity, int action) {
+        throw unsupported("animate");
+    }
+
+    default Object rotateHead(Object nmsEntity, float yaw) {
+        throw unsupported("rotateHead");
+    }
+
+    default Object setCamera(Object nmsEntity) {
+        throw unsupported("setCamera");
+    }
+
+    default Object setPassengers(Object nmsVehicle) {
+        throw unsupported("setPassengers");
+    }
+
+    default Object collectItem(int collectedId, int collectorId, int amount) {
+        throw unsupported("collectItem");
+    }
+
+    default Object setEquipment(int entityId, List<PacketViews.EquipmentEntry> slots) {
+        throw unsupported("setEquipment");
+    }
+
+    default Object blockUpdate(int x, int y, int z, Object nmsBlockState) {
+        throw unsupported("blockUpdate");
+    }
+
+    Object blockEvent(int x, int y, int z, Object nmsBlock, int type, int data);
+
+    default Object blockDestruction(int entityId, int x, int y, int z, int progress) {
+        throw unsupported("blockDestruction");
+    }
+
+    default Object gameEvent(int eventId, float value) {
+        throw unsupported("gameEvent");
+    }
+
+    default Object setTime(long gameTime, long dayTime) {
+        throw unsupported("setTime");
+    }
+
+    Object setHealth(float health, int food, float saturation);
+
+    default Object setExperience(float progress, int totalXp, int level) {
+        throw unsupported("setExperience");
+    }
+
+    default Object systemChat(Component message, boolean overlay) {
+        throw unsupported("systemChat");
+    }
+
+    default Object actionBar(Component message) {
+        throw unsupported("actionBar");
+    }
+
+    default Object tabList(Component header, Component footer) {
+        throw unsupported("tabList");
+    }
+
+    default Object titleText(Component title) {
+        throw unsupported("titleText");
+    }
+
+    default Object subtitleText(Component subtitle) {
+        throw unsupported("subtitleText");
+    }
+
+    default Object titleTimes(int fadeIn, int stay, int fadeOut) {
+        throw unsupported("titleTimes");
+    }
+
+    default Object clearTitles(boolean resetTimes) {
+        throw unsupported("clearTitles");
+    }
+
+    default Object playerInfoRemove(List<UUID> profileIds) {
+        throw unsupported("playerInfoRemove");
+    }
+
+    default Object playerInfoAdd(Object nmsServerPlayer) {
+        throw unsupported("playerInfoAdd");
+    }
+
+    default Object keepAlive(long id) {
+        throw unsupported("keepAlive");
+    }
+
+    default Object disconnect(Component reason) {
+        throw unsupported("disconnect");
     }
 
     default PacketViews.InteractView interact(Object packet) {
-        return new PacketViews.InteractView(interactEntityId(packet), interactAction(packet), Hand.MAIN_HAND, Optional.empty());
+        return new PacketViews.InteractView(entityId(packet), InteractAction.UNKNOWN, Hand.MAIN_HAND);
     }
 
-    default PlayerActionType playerAction(Object packet) {
-        return PlayerActionType.UNKNOWN;
+    default PacketViews.PlayerActionView playerAction(Object packet) {
+        return new PacketViews.PlayerActionView(PlayerActionType.UNKNOWN, null);
     }
 
-    default BlockPosView playerActionPos(Object packet) {
-        return null;
-    }
-
-    default PacketViews.PlayerActionView playerActionView(Object packet) {
-        return new PacketViews.PlayerActionView(playerAction(packet), playerActionPos(packet), BlockFace.SELF);
-    }
-
-    default Hand useItemHand(Object packet) {
-        return Hand.MAIN_HAND;
-    }
-
-    default BlockPosView useItemOnPos(Object packet) {
-        return null;
-    }
-
-    default BlockFace useItemOnFace(Object packet) {
-        return BlockFace.SELF;
-    }
-
-    default PacketViews.UseItemOnView useItemOn(Object packet) {
-        return new PacketViews.UseItemOnView(useItemHand(packet), useItemOnPos(packet), useItemOnFace(packet));
-    }
-
-    default Optional<String> soundPath(Object packet) {
-        return Optional.empty();
-    }
-
-    default double soundX(Object packet) {
-        return 0;
-    }
-
-    default double soundY(Object packet) {
-        return 0;
-    }
-
-    default double soundZ(Object packet) {
-        return 0;
-    }
-
-    default double particleX(Object packet) {
-        return 0;
-    }
-
-    default double particleY(Object packet) {
-        return 0;
-    }
-
-    default double particleZ(Object packet) {
-        return 0;
-    }
-
-    default int entityEventId(Object packet) {
-        return -1;
-    }
-
-    default boolean systemChatOverlay(Object packet) {
-        return false;
-    }
-
-    default PacketViews.ExplodeView explode(Object packet) {
-        return null;
-    }
-
-    default List<?> entityDataValues(Object packet) {
-        return List.of();
-    }
-
-    default int dataValueId(Object dataValue) {
-        return -1;
-    }
-
-    default Object dataValueValue(Object dataValue) {
-        return null;
-    }
-
-    default List<PacketViews.EquipmentEntry> equipmentSlots(Object packet) {
-        return List.of();
-    }
-
-    default int equipmentEntityId(Object packet) {
-        return entityId(packet);
-    }
-
-    default float packetHealth(Object packet) {
-        return 0f;
-    }
-
-    default int packetFood(Object packet) {
-        return 0;
-    }
-
-    default float packetSaturation(Object packet) {
-        return 0f;
-    }
-
-    default int vehicleId(Object packet) {
-        return -1;
-    }
-
-    default int[] passengerIds(Object packet) {
-        return new int[0];
-    }
-
-    default int linkSourceId(Object packet) {
-        return -1;
-    }
-
-    default int linkDestId(Object packet) {
-        return -1;
-    }
-
-    default Set<String> playerInfoActions(Object packet) {
-        return Set.of();
-    }
-
-    default List<PacketViews.PlayerInfoEntry> playerInfoEntries(Object packet) {
-        return List.of();
-    }
-
-    default List<UUID> playerInfoRemoveIds(Object packet) {
-        return List.of();
-    }
-
-    default PacketViews.SuggestionsView commandSuggestions(Object packet) {
-        return null;
-    }
-
-    default Collection<String> teamPlayers(Object packet) {
-        return List.of();
-    }
-
-    default PacketViews.ScoreView setScore(Object packet) {
-        return null;
-    }
-
-    default PacketViews.ObjectiveView setObjective(Object packet) {
-        return null;
-    }
-
-    default PacketViews.OpenScreenView openScreen(Object packet) {
-        return null;
-    }
-
-    default int containerCloseId(Object packet) {
-        return -1;
-    }
-
-    default PacketViews.ContainerSlotView containerSetSlot(Object packet) {
-        return null;
-    }
-
-    default PacketViews.ContainerContentView containerSetContent(Object packet) {
-        return null;
-    }
-
-    default Object cursorItem(Object packet) {
-        return null;
-    }
-
-    default Object createDataValue(int id, Object value) {
-        throw new UnsupportedOperationException("createDataValue");
-    }
-
-    default Object createSetEquipment(int entityId, List<PacketViews.EquipmentEntry> slots) {
-        throw new UnsupportedOperationException("createSetEquipment");
-    }
-
-    default Object createPlayerInfoUpdate(Set<String> actions, List<PacketViews.PlayerInfoEntry> entries) {
-        throw new UnsupportedOperationException("createPlayerInfoUpdate");
-    }
-
-    default Object createExplode(PacketViews.ExplodeView view) {
-        throw new UnsupportedOperationException("createExplode");
-    }
-
-    default Object withExplosionParticle(Object explodePacket, Object particle) {
-        throw new UnsupportedOperationException("withExplosionParticle");
-    }
-
-    default Object createContainerSetSlotNms(int containerId, int stateId, int slot, Object nmsItem) {
-        throw new UnsupportedOperationException("createContainerSetSlotNms");
-    }
-
-    default Object createContainerSetContent(int containerId, int stateId, List<Object> items, Object carried) {
-        throw new UnsupportedOperationException("createContainerSetContent");
-    }
-
-    default Object createSetCursorItem(Object nmsItem) {
-        throw new UnsupportedOperationException("createSetCursorItem");
-    }
-
-    default Object createSetPassengers(int vehicleId, int... passengerIds) {
-        throw new UnsupportedOperationException("createSetPassengers");
+    private static NmsUnsupportedException unsupported(String packet) {
+        return new NmsUnsupportedException("Packet '" + packet + "' is not available on this Minecraft version");
     }
 }

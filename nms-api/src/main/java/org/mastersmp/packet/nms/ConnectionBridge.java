@@ -2,15 +2,23 @@ package org.mastersmp.packet.nms;
 
 import org.bukkit.entity.Player;
 
-import io.netty.channel.Channel;
-
+/**
+ * Direct NMS connection access ({@code ServerGamePacketListenerImpl} / {@code PlayerConnection}).
+ * Does not expose Netty; packet I/O goes through {@link PlayerBridge#send}.
+ */
 public interface ConnectionBridge {
 
-    Channel channel(Player player);
-
+    /**
+     * NMS {@code Connection} / {@code NetworkManager}.
+     */
     Object connection(Player player);
 
-    Object gamePacketListener(Player player);
+    /**
+     * NMS {@code ServerGamePacketListenerImpl} / {@code PlayerConnection}.
+     */
+    Object listener(Player player);
 
-    String[] injectBeforeNames();
+    int latency(Player player);
+
+    boolean accepting(Player player);
 }

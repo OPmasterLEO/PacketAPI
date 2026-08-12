@@ -130,7 +130,7 @@ public final class AdvancedScheduler {
         return workers.schedule(task, delay, unit);
     }
 
-    public TaskHandle runOffNetty(Entity entity, Runnable task) {
+    public TaskHandle runOnEntityThread(Entity entity, Runnable task) {
         if (Bukkit.isPrimaryThread() || isOwnedByCurrentRegion(entity)) {
             task.run();
             return TaskHandle.noop();
@@ -138,7 +138,7 @@ public final class AdvancedScheduler {
         return runEntity(entity, task);
     }
 
-    public TaskHandle runOffNetty(Location location, Runnable task) {
+    public TaskHandle runOnRegionThread(Location location, Runnable task) {
         if (Bukkit.isPrimaryThread() || isOwnedByCurrentRegion(location)) {
             task.run();
             return TaskHandle.noop();

@@ -3,57 +3,36 @@ package org.mastersmp.packet.nms.shared;
 import org.bukkit.craftbukkit.NMS.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import io.netty.channel.Channel;
 import net.minecraft.server.NMS.EntityPlayer;
-import net.minecraft.server.NMS.NetworkManager;
-import net.minecraft.server.NMS.PlayerConnection;
 import org.mastersmp.packet.nms.ConnectionBridge;
-
-import static org.mastersmp.packet.nms.shared.Reflect.field;
-import static org.mastersmp.packet.nms.shared.Reflect.get;
 
 public final class SharedConnectionBridge implements ConnectionBridge {
 
-    private static final String[] ANCHORS = {
-            "packet_handler",
-            "encoder",
-            "decoder",
-            "prepender",
-            "compress"
-    };
-
-    @Override
-    public Channel channel(Player player) {
-        EntityPlayer sp = handle(player);
-        if (sp == null || sp.playerConnection == null) {
-            return null;
-        }
-        NetworkManager manager = sp.playerConnection.networkManager;
-        Object channel = get(field(manager.getClass(), "channel"), manager);
-        return channel instanceof Channel c ? c : null;
-    }
-
     @Override
     public Object connection(Player player) {
-        EntityPlayer sp = handle(player);
+        EntityPlayer sp = nms(player);
         return sp == null || sp.playerConnection == null ? null : sp.playerConnection.networkManager;
     }
 
     @Override
-    public Object gamePacketListener(Player player) {
-        EntityPlayer sp = handle(player);
+    public Object listener(Player player) {
+        EntityPlayer sp = nms(player);
         return sp == null ? null : sp.playerConnection;
     }
 
     @Override
-    public String[] injectBeforeNames() {
-        return ANCHORS.clone();
+    public int latency(Player player) {
+        EntityPlayer sp = nms(player);
+        return sp == null ? 0 : sp.ping;
     }
 
-    private static EntityPlayer handle(Player player) {
-        if (player instanceof CraftPlayer craft) {
-            return craft.getHandle();
-        }
-        return null;
+    @Override
+    public boolean accepting(Player player) {
+        EntityPlayer sp = nms(player);
+        return sp != null && sp.playerConnection != null && player.isOnline();
+    }
+
+    private static EntityPlayer nms(Player player) {
+        return player instanceof CraftPlayer craft ? craft.getHandle() : null;
     }
 }

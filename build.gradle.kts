@@ -182,6 +182,13 @@ tasks.named("publishApiPublicationToReposiliteSnapshotsRepository").configure {
     onlyIf { publishingSnapshot }
 }
 
+tasks.named("publishAllPublicationsToReposiliteReleasesRepository").configure {
+    onlyIf { !publishingSnapshot }
+}
+tasks.named("publishAllPublicationsToReposiliteSnapshotsRepository").configure {
+    onlyIf { publishingSnapshot }
+}
+
 tasks.named("publish").configure {
     group = "publishing"
     description = "Publish fat jar to Reposilite releases"

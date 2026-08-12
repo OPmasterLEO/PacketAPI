@@ -5,5 +5,5 @@ api-version: '1.16'
 folia-supported: true
 load: STARTUP
 authors: [OPmasterLEO]
-description: Multi-version NMS and packet abstraction for Paper, Folia and Canvas.
+description: Direct NMS packet API for Paper, Folia and Canvas. No Netty intercept.
 website: https://github.com/OPmasterLEO/PacketAPI

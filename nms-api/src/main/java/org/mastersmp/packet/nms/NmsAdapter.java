@@ -18,8 +18,6 @@ public interface NmsAdapter {
 
     ComponentBridge components();
 
-    PacketWrapper wrapper();
-
     default MetadataBridge metadata() {
         return UnsupportedMetadata.INSTANCE;
     }

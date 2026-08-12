@@ -42,11 +42,12 @@ public interface RandomBridge {
     }
 
     default <T> T pickWeighted(Collection<Map.Entry<T, Integer>> weights) {
-        return this.<T>pickWeighted(weights.stream().collect(java.util.stream.Collectors.toMap(
+        Map<T, Integer> map = weights.stream().collect(java.util.stream.Collectors.toMap(
                 Map.Entry::getKey,
                 Map.Entry::getValue,
                 Integer::sum,
                 java.util.LinkedHashMap::new
-        )));
+        ));
+        return pickWeighted(map);
     }
 }

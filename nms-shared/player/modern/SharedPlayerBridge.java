@@ -23,18 +23,31 @@ public final class SharedPlayerBridge implements PlayerBridge {
         if (!(nmsPacket instanceof Packet<?> packet)) {
             return;
         }
-        Object handle = handle(player);
-        if (handle instanceof ServerPlayer sp && sp.connection != null) {
+        ServerPlayer sp = nms(player);
+        if (sp != null && sp.connection != null) {
             sp.connection.send(packet);
         }
     }
 
     @Override
     public boolean isConnected(Player player) {
-        Object handle = handle(player);
-        if (!(handle instanceof ServerPlayer sp) || sp.connection == null) {
-            return false;
-        }
-        return sp.connection.isAcceptingMessages();
+        ServerPlayer sp = nms(player);
+        return sp != null && sp.connection != null && sp.connection.isAcceptingMessages();
+    }
+
+    @Override
+    public int entityId(Player player) {
+        ServerPlayer sp = nms(player);
+        return sp == null ? -1 : sp.getId();
+    }
+
+    @Override
+    public Object level(Player player) {
+        ServerPlayer sp = nms(player);
+        return sp == null ? null : sp.level();
+    }
+
+    private static ServerPlayer nms(Player player) {
+        return player instanceof CraftPlayer craft ? craft.getHandle() : null;
     }
 }

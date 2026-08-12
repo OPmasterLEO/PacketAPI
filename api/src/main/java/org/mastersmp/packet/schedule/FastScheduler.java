@@ -3,14 +3,12 @@ package org.mastersmp.packet.schedule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
-
-import io.netty.channel.Channel;
-import org.mastersmp.packet.channel.ChannelOps;
 
 public final class FastScheduler {
 
@@ -40,16 +38,12 @@ public final class FastScheduler {
         }
     }
 
-    public void coalesceEventLoop(Channel channel, Runnable task) {
-        Objects.requireNonNull(channel, "channel");
-        Objects.requireNonNull(task, "task");
-        ChannelOps.runInEventLoop(channel, task);
-    }
-
     public void shutdown() {
         globalFlushHandle.cancel();
         globalQueue.clear();
         globalFlushScheduled.set(false);
+        ENTITY_QUEUES.clear();
+        ENTITY_FLAGS.clear();
     }
 
     private void flushGlobal() {
@@ -103,8 +97,8 @@ public final class FastScheduler {
         return ENTITY_FLAGS.computeIfAbsent(key, k -> new AtomicBoolean());
     }
 
-    private static final java.util.concurrent.ConcurrentHashMap<Object, ConcurrentLinkedQueue<Runnable>> ENTITY_QUEUES =
-            new java.util.concurrent.ConcurrentHashMap<>();
-    private static final java.util.concurrent.ConcurrentHashMap<Object, AtomicBoolean> ENTITY_FLAGS =
-            new java.util.concurrent.ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Object, ConcurrentLinkedQueue<Runnable>> ENTITY_QUEUES =
+            new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Object, AtomicBoolean> ENTITY_FLAGS =
+            new ConcurrentHashMap<>();
 }

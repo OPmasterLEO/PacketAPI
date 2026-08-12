@@ -3,89 +3,69 @@ package org.mastersmp.packet.nms.shared;
 import org.bukkit.craftbukkit.NMS.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import io.netty.channel.Channel;
 import net.minecraft.network.Connection;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.mastersmp.packet.nms.ConnectionBridge;
 
 import static org.mastersmp.packet.nms.shared.Reflect.field;
 import static org.mastersmp.packet.nms.shared.Reflect.get;
+import static org.mastersmp.packet.nms.shared.Reflect.invoke;
 
 public final class SharedConnectionBridge implements ConnectionBridge {
 
-    private static final String[] ANCHORS = {
-            "packet_handler",
-            "encoder",
-            "decoder",
-            "prepender",
-            "compress"
-    };
-
-    @Override
-    public Channel channel(Player player) {
-        ServerPlayer sp = handle(player);
-        if (sp == null) {
-            return null;
-        }
-        Connection connection = resolveConnection(sp);
-        if (connection != null && connection.channel != null) {
-            return connection.channel;
-        }
-        return channelByAddress(player);
-    }
-
     @Override
     public Object connection(Player player) {
-        ServerPlayer sp = handle(player);
-        return sp == null ? null : resolveConnection(sp);
+        ServerPlayer sp = nms(player);
+        if (sp == null || sp.connection == null) {
+            return null;
+        }
+        if (sp.connection instanceof ServerGamePacketListenerImpl listener) {
+            Object value = get(field(listener.getClass(), "connection"), listener);
+            return value instanceof Connection connection ? connection : listener;
+        }
+        Object value = get(field(sp.connection.getClass(), "connection", "networkManager"), sp.connection);
+        return value instanceof Connection connection ? connection : sp.connection;
     }
 
     @Override
-    public Object gamePacketListener(Player player) {
-        ServerPlayer sp = handle(player);
+    public Object listener(Player player) {
+        ServerPlayer sp = nms(player);
         return sp == null ? null : sp.connection;
     }
 
     @Override
-    public String[] injectBeforeNames() {
-        return ANCHORS.clone();
+    public int latency(Player player) {
+        ServerPlayer sp = nms(player);
+        if (sp == null) {
+            return 0;
+        }
+        Object ping = invoke(sp, "latency", "getPing");
+        if (ping instanceof Integer i) {
+            return i;
+        }
+        Object listener = sp.connection;
+        ping = invoke(listener, "latency", "getLatency");
+        if (ping instanceof Integer i) {
+            return i;
+        }
+        return player.getPing();
     }
 
-    private static ServerPlayer handle(Player player) {
-        if (player instanceof CraftPlayer craft) {
-            return craft.getHandle();
+    @Override
+    public boolean accepting(Player player) {
+        ServerPlayer sp = nms(player);
+        if (sp == null || sp.connection == null) {
+            return false;
         }
-        return null;
+        Object accepting = invoke(sp.connection, "isAcceptingMessages");
+        if (accepting instanceof Boolean b) {
+            return b;
+        }
+        return player.isOnline();
     }
 
-    private static Connection resolveConnection(ServerPlayer sp) {
-        if (sp.connection instanceof ServerGamePacketListenerImpl listener) {
-            Object value = get(field(listener.getClass(), "connection"), listener);
-            return value instanceof Connection connection ? connection : null;
-        }
-        Object value = get(field(sp.connection.getClass(), "connection", "networkManager"), sp.connection);
-        return value instanceof Connection connection ? connection : null;
-    }
-
-    private static Channel channelByAddress(Player player) {
-        if (player == null || player.getAddress() == null) {
-            return null;
-        }
-        try {
-            var address = player.getAddress().getAddress();
-            for (Connection connection : MinecraftServer.getServer().getConnection().getConnections()) {
-                if (connection == null || connection.channel == null) {
-                    continue;
-                }
-                if (connection.getRemoteAddress() instanceof java.net.InetSocketAddress remote
-                        && address.equals(remote.getAddress())) {
-                    return connection.channel;
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return null;
+    private static ServerPlayer nms(Player player) {
+        return player instanceof CraftPlayer craft ? craft.getHandle() : null;
     }
 }

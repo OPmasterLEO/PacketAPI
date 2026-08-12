@@ -29,6 +29,7 @@ val parts: SharedParts = when (era) {
 
 val sharedVariantDirs: List<File> = buildList {
     val root = rootProject.file("nms-shared")
+    add(root)
     add(File(root, "adapter/${parts.adapter}"))
     add(File(root, "connection/${parts.connection}"))
     add(File(root, "player/${parts.player}"))
@@ -58,6 +59,10 @@ val prepareSharedSources = tasks.register("prepareSharedSources") {
                     .replace(
                         "package org.mastersmp.packet.nms.shared;",
                         "package $versionSharedPackage;"
+                    )
+                    .replace(
+                        "import static org.mastersmp.packet.nms.shared.",
+                        "import static $versionSharedPackage."
                     )
                     .replace(
                         "import org.mastersmp.packet.nms.shared.",

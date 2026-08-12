@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.mastersmp.packet.channel.PacketChannels;
-import org.mastersmp.packet.channel.PacketListenerBus;
 import org.mastersmp.packet.component.Components;
 import org.mastersmp.packet.item.Items;
 import org.mastersmp.packet.menu.Menus;
@@ -26,8 +24,6 @@ public final class PacketAPI {
     private final JavaPlugin plugin;
     private final NmsAdapter adapter;
     private final Schedulers schedulers;
-    private final PacketChannels channels;
-    private final PacketListenerBus listeners;
     private final Packets packets;
     private final Items items;
     private final Menus menus;
@@ -42,8 +38,6 @@ public final class PacketAPI {
         this.plugin = plugin;
         this.adapter = adapter;
         this.schedulers = new Schedulers(plugin);
-        this.channels = new PacketChannels(adapter, schedulers);
-        this.listeners = new PacketListenerBus(channels, adapter);
         this.packets = new Packets(adapter);
         this.items = new Items(adapter);
         this.menus = new Menus(adapter);
@@ -75,8 +69,6 @@ public final class PacketAPI {
     }
 
     public void shutdown() {
-        listeners.clear();
-        channels.uninjectAll();
         schedulers.shutdown();
         if (instance == this) {
             instance = null;
@@ -93,14 +85,6 @@ public final class PacketAPI {
 
     public Schedulers schedulers() {
         return schedulers;
-    }
-
-    public PacketChannels channels() {
-        return channels;
-    }
-
-    public PacketListenerBus listeners() {
-        return listeners;
     }
 
     public Packets packets() {
