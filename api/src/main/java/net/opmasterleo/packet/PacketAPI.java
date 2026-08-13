@@ -2,8 +2,12 @@ package net.opmasterleo.packet;
 
 import java.util.Objects;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.opmasterleo.packet.channel.InjectionProbe;
+import net.opmasterleo.packet.channel.PacketChannels;
+import net.opmasterleo.packet.channel.PacketListenerBus;
 import net.opmasterleo.packet.component.Components;
 import net.opmasterleo.packet.item.Items;
 import net.opmasterleo.packet.menu.Menus;
@@ -24,6 +28,8 @@ public final class PacketAPI {
     private final JavaPlugin plugin;
     private final NmsAdapter adapter;
     private final Schedulers schedulers;
+    private final PacketChannels channels;
+    private final PacketListenerBus listeners;
     private final Packets packets;
     private final Items items;
     private final Menus menus;
@@ -38,6 +44,8 @@ public final class PacketAPI {
         this.plugin = plugin;
         this.adapter = adapter;
         this.schedulers = new Schedulers(plugin);
+        this.listeners = PacketListenerBus.create(adapter, schedulers, plugin.getName(), plugin.getLogger());
+        this.channels = listeners.channels();
         this.packets = new Packets(adapter);
         this.items = new Items(adapter);
         this.menus = new Menus(adapter);
@@ -69,10 +77,25 @@ public final class PacketAPI {
     }
 
     public void shutdown() {
+        listeners.clear();
         schedulers.shutdown();
         if (instance == this) {
             instance = null;
         }
+    }
+
+    /**
+     * Probe Netty injection ownership for a player (this instance / foreign / none).
+     */
+    public InjectionProbe.Result detectInjectionConflicts(Player player) {
+        return listeners.detectConflicts(player);
+    }
+
+    /**
+     * Status/debug summary of injection ownership for a player.
+     */
+    public String injectionStatus(Player player) {
+        return listeners.describeInjection(player);
     }
 
     public JavaPlugin plugin() {
@@ -85,6 +108,14 @@ public final class PacketAPI {
 
     public Schedulers schedulers() {
         return schedulers;
+    }
+
+    public PacketChannels channels() {
+        return channels;
+    }
+
+    public PacketListenerBus listeners() {
+        return listeners;
     }
 
     public Packets packets() {

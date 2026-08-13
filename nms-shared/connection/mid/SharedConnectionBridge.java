@@ -3,6 +3,7 @@ package net.opmasterleo.packet.nms.shared;
 import org.bukkit.craftbukkit.NMS.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import io.netty.channel.Channel;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -13,6 +14,29 @@ import static net.opmasterleo.packet.nms.shared.Reflect.get;
 import static net.opmasterleo.packet.nms.shared.Reflect.invoke;
 
 public final class SharedConnectionBridge implements ConnectionBridge {
+
+    private static final String[] ANCHORS = {
+            "packet_handler",
+            "encoder",
+            "decoder",
+            "prepender",
+            "compress"
+    };
+
+    @Override
+    public Channel channel(Player player) {
+        Object raw = connection(player);
+        if (raw instanceof Connection connection && connection.channel != null) {
+            return connection.channel;
+        }
+        if (raw != null) {
+            Object value = get(field(raw.getClass(), "channel"), raw);
+            if (value instanceof Channel channel) {
+                return channel;
+            }
+        }
+        return null;
+    }
 
     @Override
     public Object connection(Player player) {
@@ -63,6 +87,11 @@ public final class SharedConnectionBridge implements ConnectionBridge {
             return b;
         }
         return player.isOnline();
+    }
+
+    @Override
+    public String[] injectBeforeNames() {
+        return ANCHORS.clone();
     }
 
     private static ServerPlayer nms(Player player) {
