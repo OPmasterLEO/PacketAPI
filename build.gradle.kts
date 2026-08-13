@@ -13,11 +13,16 @@ allprojects {
 
     repositories {
         mavenCentral()
-        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.codemc.io/repository/nms/")
         maven("https://repo.codemc.org/repository/nms/")
+        mavenLocal {
+            content {
+                includeGroup("org.spigotmc")
+                includeGroup("org.bukkit")
+            }
+        }
     }
 }
 
