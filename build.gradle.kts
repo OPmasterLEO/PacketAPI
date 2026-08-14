@@ -108,11 +108,11 @@ publishing {
                 classifier = null
             }
             pom {
-                name.set("MasterPacketAPI")
+                name.set("PacketAPI")
                 description.set(
                     "Multi-version NMS / packet abstraction for Paper, Folia and Canvas (1.16–26.x)."
                 )
-                url.set("https://github.com/OPmasterLEO/MasterPacketAPI")
+                url.set("https://github.com/OPmasterLEO/PacketAPI")
                 licenses {
                     license {
                         name.set("GNU Lesser General Public License v3.0")
