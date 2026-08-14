@@ -103,7 +103,7 @@ tasks.build {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "masterpacketapi"
+            artifactId = "packetapi"
             artifact(tasks.shadowJar) {
                 classifier = null
             }
@@ -130,22 +130,7 @@ publishing {
                 }
             }
         }
-        create<MavenPublication>("api") {
-            artifactId = "packetapi-api"
-            from(project(":api").components["java"])
-            pom {
-                name.set("packetapi-api")
-                description.set("Version-agnostic PacketAPI interfaces (compile-only for consumers).")
-                url.set("https://github.com/OPmasterLEO/MasterPacketAPI")
-                licenses {
-                    license {
-                        name.set("GNU Lesser General Public License v3.0")
-                        url.set("https://www.gnu.org/licenses/lgpl-3.0.html")
-                    }
-                }
-            }
         }
-    }
     repositories {
         fun org.gradle.api.artifacts.repositories.MavenArtifactRepository.reposiliteAuth() {
             isAllowInsecureProtocol = true
@@ -180,12 +165,6 @@ tasks.named("publishMavenPublicationToReposiliteReleasesRepository").configure {
 tasks.named("publishMavenPublicationToReposiliteSnapshotsRepository").configure {
     onlyIf { publishingSnapshot }
 }
-tasks.named("publishApiPublicationToReposiliteReleasesRepository").configure {
-    onlyIf { !publishingSnapshot }
-}
-tasks.named("publishApiPublicationToReposiliteSnapshotsRepository").configure {
-    onlyIf { publishingSnapshot }
-}
 
 tasks.named("publishAllPublicationsToReposiliteReleasesRepository").configure {
     onlyIf { !publishingSnapshot }
@@ -203,7 +182,7 @@ tasks.named("publish").configure {
 tasks.register("publishSnapshot") {
     group = "publishing"
     description = "Publish fat jar to Reposilite snapshots"
-    dependsOn(tasks.shadowJar, "publishMavenPublicationToReposiliteSnapshotsRepository", "publishApiPublicationToReposiliteSnapshotsRepository")
+    dependsOn(tasks.shadowJar, "publishMavenPublicationToReposiliteSnapshotsRepository")
 }
 
 tasks.register("printVersion") {
