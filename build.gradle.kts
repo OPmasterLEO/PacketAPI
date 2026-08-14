@@ -8,7 +8,7 @@ plugins {
 val pluginVersion: String by project
 
 allprojects {
-    group = "net.opmasterleo.packet"
+    group = "net.opmasterleo"
     version = pluginVersion
 
     repositories {
@@ -103,7 +103,7 @@ tasks.build {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "packetapi"
+            artifactId = "PacketAPI"
             artifact(tasks.shadowJar) {
                 classifier = null
             }

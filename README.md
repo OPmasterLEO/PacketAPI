@@ -13,6 +13,61 @@ Modern, versioned access to the Minecraft protocol through **direct NMS** (`Craf
 - Ownership-aware `PacketListenerBus.ensureInjected` (single inject entry point) that detects foreign shaded copies via pipeline markers and backs off instead of hijacking
 - No duplication of PacketUxUi window click / open / set-slot / cursor / book packets
 
+## Add the dependency
+
+Latest release: `1.0.2` — hosted on [Reposilite](http://repo.mastersmp.net/releases).
+
+**Maven** (`pom.xml`):
+
+```xml
+<repositories>
+    <repository>
+        <id>mastersmp-releases</id>
+        <url>http://repo.mastersmp.net/releases</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>net.opmasterleo</groupId>
+        <artifactId>PacketAPI</artifactId>
+        <version>1.0.2</version>
+    </dependency>
+</dependencies>
+```
+
+**Gradle (Groovy)** (`build.gradle`):
+
+```groovy
+repositories {
+    maven {
+        name = "mastersmp-releases"
+        url = uri("http://repo.mastersmp.net/releases")
+        isAllowInsecureProtocol = true
+    }
+}
+
+dependencies {
+    implementation("net.opmasterleo:PacketAPI:1.0.2")
+}
+```
+
+**Gradle (Kotlin DSL)** (`build.gradle.kts`):
+
+```kotlin
+repositories {
+    maven {
+        name = "mastersmp-releases"
+        url = uri("http://repo.mastersmp.net/releases")
+        isAllowInsecureProtocol = true
+    }
+}
+
+dependencies {
+    implementation("net.opmasterleo:PacketAPI:1.0.2")
+}
+```
+
 ## Send a packet
 
 ```java
