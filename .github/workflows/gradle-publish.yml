@@ -24,7 +24,15 @@ jobs:
           cache: "gradle"
 
       - name: Build with Gradle
-        run: chmod +x gradlew && ./gradlew shadowJar -x test --no-daemon
+        run: |
+          chmod +x gradlew
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            ./gradlew shadowJar -x test --no-daemon \
+              -PversionSuffix="-${GITHUB_SHA::7}"
+          else
+            ./gradlew shadowJar -x test --no-daemon
+          fi
 
       - name: Upload PacketAPI jar
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -40,7 +48,9 @@ jobs:
             echo "Missing REPOSILITE_USER / REPOSILITE_TOKEN secrets (token name + secret)."
             exit 1
           fi
-          ./gradlew publishSnapshot -x test --no-daemon
+
+          ./gradlew publishSnapshot -x test --no-daemon \
+            -PversionSuffix="-${GITHUB_SHA::7}"
         env:
           REPOSILITE_USER: ${{ secrets.REPOSILITE_USER }}
           REPOSILITE_TOKEN: ${{ secrets.REPOSILITE_TOKEN }}
